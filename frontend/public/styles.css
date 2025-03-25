@@ -1,0 +1,724 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #fff;
+  }
+  
+ 
+  
+  .site-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6B4C2A;
+    text-transform: uppercase;
+  }
+  
+  
+  
+  .hero {
+    display: flex;
+    flex-direction: column;
+    padding: 0 80px;
+    margin-top: 40px;
+  }
+  
+  .hero-text h1 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  
+  .hero-text p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #454545;
+    max-width: 550px;
+  }
+  
+  .hero-btn {
+    background-color: #000;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    margin: 24px 0;
+    cursor: pointer;
+  }
+  
+  .hero-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+  .logo {
+    width: 120px;
+    height: auto;
+  }
+  
+  .hero-section {
+    padding: 60px;
+    max-width: 1000px;
+    margin: auto;
+  }
+  
+  .hero-section h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .hero-section p {
+    margin: 10px 0 20px;
+    font-size: 18px;
+    color: #444;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #000;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 30px;
+    font-weight: 500;
+  }
+  
+  .hero-image-wrapper {
+    margin-top: 20px;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+  
+  
+  
+  .login-button {
+    background: #454545;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  
+  .hero-section {
+    padding: 60px;
+  }
+  
+  .hero-section h1 {
+    font-size: 36px;
+    font-weight: 700;
+  }
+  
+  .hero-section p {
+    margin: 10px 0 20px;
+    color: #444;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #000;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 30px;
+  }
+  
+  .hero-image {
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    border-radius: 12px;
+  }
+  
+
+  .login-button {
+    background-color: #454545;
+    color: white;               /* <-- make the text white */
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .hero-image {
+    width: 100%;
+    max-width: 900px;  /* Make it larger than before */
+    border-radius: 12px;
+    display: block;
+    margin-top: 20px;
+  }
+    
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+  
+ 
+  
+  .login-button {
+    background: #454545;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+  
+  .hero-section {
+    padding: 60px;
+  }
+  
+  .hero-section h1 {
+    font-size: 36px;
+    font-weight: 700;
+  }
+  
+  .hero-section p {
+    margin: 10px 0 20px;
+    color: #444;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #000;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 30px;
+  }
+  
+  .hero-image {
+    width: 100%;
+    max-width: 1000px;
+    height: auto;
+    border-radius: 12px;
+  }
+  
+  
+  /* Profile Section */
+  .profile-container {
+    display: flex;
+    padding: 80px;
+    gap: 60px;
+    align-items: center;
+  }
+  
+  .profile-image {
+    width: 476px;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .profile-info h1 {
+    font-size: 40px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  
+  .profile-info p {
+    font-size: 24px;
+    color: #828282;
+    margin: 10px 0;
+  }
+  
+  .profile-info button {
+    margin-top: 20px;
+    background: #454545;
+    color: white;
+    padding: 14px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  /* Room Booked Section */
+  .section-title {
+    font-size: 32px;
+    font-weight: 600;
+    padding: 0 80px;
+    margin-top: 60px;
+  }
+  
+  .room-cards {
+    display: flex;
+    gap: 32px;
+    padding: 40px 80px;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    width: 404px;
+  }
+  
+  .card img {
+    width: 100%;
+    height: 387px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .card h3 {
+    font-size: 24px;
+    margin-top: 12px;
+  }
+  
+  .card p {
+    font-size: 20px;
+    color: #828282;
+  }
+  
+  /* Check-in */
+  .check-in-container {
+    text-align: center;
+    margin: 40px 0;
+  }
+  
+  .check-in-btn {
+    background: #454545;
+    color: #fff;
+    padding: 14px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  /* Contact Info */
+  .hotel-contact {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 80px;
+  }
+  
+  .hotel-contact h4 {
+    font-size: 24px;
+  }
+  
+  .info-note {
+    padding: 0 80px 80px;
+    font-size: 24px;
+    color: #000;
+  }
+   
+  
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #000;
+  }
+  
+  
+  .logo {
+    height: 60px;
+  }
+ 
+  
+  .login-btn {
+    padding: 14px 24px;
+    background: #454545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .rooms-section {
+    padding: 64px 80px;
+  }
+  
+  .page-title {
+    font-size: 64px;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  
+  .chip-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  
+  .chip {
+    padding: 6px 16px;
+    border: 1px solid #CAC4D0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #49454F;
+    font-weight: 500;
+    background: white;
+    cursor: pointer;
+  }
+  
+  .room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 48px;
+  }
+  
+  .room-card {
+    background: #f9f9f9;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+  }
+  
+  .room-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .room-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+  }
+  
+  .room-subheading {
+    font-size: 24px;
+    font-weight: 500;
+    margin: 16px;
+  }
+  
+  .room-text {
+    font-size: 16px;
+    color: #828282;
+    margin: 0 16px 24px;
+    line-height: 1.5;
+  }
+  
+  .footer {
+    padding: 40px 80px;
+    background: #fff;
+    border-top: 1px solid #e6e6e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .footer p {
+    margin: 0;
+    font-size: 16px;
+    color: #828282;
+  }
+  
+  .social-icons img {
+    width: 24px;
+    height: 24px;
+    margin-left: 16px;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #000;
+  }
+  
+  /* Navigation */
+  /* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 40px;
+    background-color: white;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    height: 80px;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .login-button {
+    background-color: #454545;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  
+  
+  /* Booking Confirmation Section */
+  .confirmation-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 164px); /* navbar height subtracted */
+    text-align: center;
+  }
+  
+  .confirmation-title {
+    font-size: 32px;
+    font-weight: 600;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #000;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 80px;
+  }
+  
+  .logo {
+    height: 60px;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #454545;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  .login-btn {
+    padding: 14px 24px;
+    background: #454545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .contact-section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+  
+  .contact-section h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  
+  .contact-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    margin-bottom: 64px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 16px);
+  }
+  
+  .form-group.full {
+    width: 100%;
+  }
+  
+  .form-group label {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  
+  .form-group textarea {
+    height: 162px;
+    resize: vertical;
+  }
+  
+  .submit-btn {
+    background: #000;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 500;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .contact-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+  }
+  
+  .info-block {
+    width: calc(50% - 24px);
+  }
+  
+  .info-block.full {
+    width: 100%;
+  }
+  
+  .icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .info-block h3 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  
+  .info-block p {
+    font-size: 20px;
+    color: #828282;
+    line-height: 1.5;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 80px;
+    background-color: #ffffff;
+  }
+  
+  .logo {
+    width: 150px;
+    height: auto;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    font-size: 20px;
+    color: #454545;
+    font-weight: 500;
+  }
+  
+  .login-btn {
+    background-color: #454545;
+    color: #ffffff;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  /* About section */
+  .about-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 80px;
+  }
+  
+  .about-text {
+    max-width: 600px;
+  }
+  
+  .about-text h1 {
+    font-size: 64px;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .about-text p {
+    font-size: 20px;
+    font-weight: 500;
+    margin-top: 16px;
+  }
+  
+  .about-image img {
+    width: 508px;
+    height: 657px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  /* Info grid */
+  .info-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 0 80px 80px 80px;
+  }
+  
+  .info-card {
+    width: 45%;
+    max-width: 515px;
+  }
+  
+  .info-card h3 {
+    font-size: 24px;
+    font-weight: 500;
+    color: #000000;
+    margin-bottom: 12px;
+  }
+  
+  .info-card p {
+    font-size: 20px;
+    font-weight: 400;
+    color: #828282;
+    line-height: 30px;
+  }
+  .hero-image {
+    width: 100%;
+    height: 500px; /* or adjust to your preference */
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto;
+}
+
+
+  

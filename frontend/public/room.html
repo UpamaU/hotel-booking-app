@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rooms | E-Hotel</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    .filter-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    .filter-group select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .room-card {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <a href="index.html">
+      <img src="images/logo.png" alt="E-Hotel Logo" class="logo" />
+    </a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="room.html">Rooms</a>
+      <a href="about.html">About Us</a>
+      <a href="profile.html">Profile</a>
+      <a href="login.htm" class="login-btn">Login</a>
+    </nav>
+  </header>
+
+  <main class="rooms-section">
+    <h1 class="page-title">Rooms</h1>
+
+    <!-- Filter Section -->
+    <div class="filter-group">
+      <select id="capacityFilter">
+        <option value="">Capacity</option>
+        <option value="1">1 Person</option>
+        <option value="2">2 People</option>
+        <option value="4">4 People</option>
+      </select>
+
+      <select id="viewFilter">
+        <option value="">View</option>
+        <option value="ocean">Ocean</option>
+        <option value="city">City</option>
+        <option value="garden">Garden</option>
+      </select>
+
+      <select id="chainFilter">
+        <option value="">Hotel Chain</option>
+        <option value="hilton">Hilton</option>
+        <option value="marriott">Marriott</option>
+        <option value="local">Local Boutique</option>
+      </select>
+
+      <select id="extendableFilter">
+        <option value="">Extendable</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <!-- Room Grid -->
+    <section class="room-grid" id="roomGrid">
+      <div class="room-card" data-capacity="2" data-view="ocean" data-chain="hilton" data-extendable="yes">
+        <img src="images/room1.jpeg" alt="Room 1" class="room-image" />
+        <h2 class="room-subheading">Ocean View Suite</h2>
+        <p class="room-text">Spacious room with modern design, balcony access, and stunning ocean views. Ideal for couples or solo travelers.</p>
+      </div>
+      <div class="room-card" data-capacity="2" data-view="city" data-chain="hilton" data-extendable="no">
+        <img src="images/room-bed.jpeg" alt="Room 4" class="room-image" />
+        <h2 class="room-subheading">Luxury Studio</h2>
+        <p class="room-text">Includes a full-size desk, LED wall accents, and an open-concept glass bathroom. Stylish and functional.</p>
+      </div>
+      <div class="room-card" data-capacity="4" data-view="city" data-chain="marriott" data-extendable="no">
+        <img src="images/room2.jpeg" alt="Room 2" class="room-image" />
+        <h2 class="room-subheading">Double Deluxe</h2>
+        <p class="room-text">Perfect for friends or families, with two comfortable beds, work desk, and a sleek LED lighting setup.</p>
+      </div>
+
+      <div class="room-card" data-capacity="1" data-view="garden" data-chain="local" data-extendable="yes">
+        <img src="images/room3.jpeg" alt="Room 3" class="room-image" />
+        <h2 class="room-subheading">Zen Minimalist Room</h2>
+        <p class="room-text">Designed for tranquility and relaxation, with clean lines, warm tones, and natural textures throughout.</p>
+      </div>
+      <div class="room-card" data-capacity="4" data-view="city" data-chain="marriott" data-extendable="no">
+        <img src="images/room2.jpeg" alt="Room 2" class="room-image" />
+        <h2 class="room-subheading">Double Deluxe</h2>
+        <p class="room-text">Perfect for friends or families, with two comfortable beds, work desk, and a sleek LED lighting setup.</p>
+      </div>
+
+      <div class="room-card" data-capacity="2" data-view="city" data-chain="hilton" data-extendable="no">
+        <img src="images/room-bed.jpeg" alt="Room 4" class="room-image" />
+        <h2 class="room-subheading">Luxury Studio</h2>
+        <p class="room-text">Includes a full-size desk, LED wall accents, and an open-concept glass bathroom. Stylish and functional.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const filters = {
+      capacity: '',
+      view: '',
+      chain: '',
+      extendable: ''
+    };
+
+    const roomCards = document.querySelectorAll('.room-card');
+
+    const applyFilters = () => {
+      roomCards.forEach(card => {
+        const matches =
+          (!filters.capacity || card.dataset.capacity === filters.capacity) &&
+          (!filters.view || card.dataset.view === filters.view) &&
+          (!filters.chain || card.dataset.chain === filters.chain) &&
+          (!filters.extendable || card.dataset.extendable === filters.extendable);
+
+        card.style.display = matches ? 'block' : 'none';
+      });
+    };
+
+    document.getElementById('capacityFilter').addEventListener('change', e => {
+      filters.capacity = e.target.value;
+      applyFilters();
+    });
+    document.getElementById('viewFilter').addEventListener('change', e => {
+      filters.view = e.target.value;
+      applyFilters();
+    });
+    document.getElementById('chainFilter').addEventListener('change', e => {
+      filters.chain = e.target.value;
+      applyFilters();
+    });
+    document.getElementById('extendableFilter').addEventListener('change', e => {
+      filters.extendable = e.target.value;
+      applyFilters();
+    });
+
+    // Show all rooms by default
+    applyFilters();
+  </script>
+</body>
+</html>
