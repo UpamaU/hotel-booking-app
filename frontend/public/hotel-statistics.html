@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Statistics</title>
+
+    <link rel="stylesheet" href="styles.css">
+    
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+    <script src="https://unpkg.com/@babel/standalone"></script>
+</head>
+
+<body>
+    <!-- NAVIGATION -->
+    <header class="navbar">
+        <a href="index.html">
+            <img src="images/logo.png" alt="E-Hotel Logo" class="logo" />
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="room.html">Rooms</a>
+            <a href="about.html">About Us</a>
+            <a href="profile.html">Profile</a>
+            <a href="login.htm" class="login-btn">Login</a>
+            <a href="hotel-statistics.html" >Hotel Statistics</a> 
+        </nav>
+    </header>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // HotelStatus Component
+        const { useState, useEffect } = React;
+
+        function HotelStatus() {
+            const [hotelData, setHotelData] = useState([]);
+            const [selectedHotel, setSelectedHotel] = useState(""); 
+
+            useEffect(() => {
+                fetch('http://localhost:5001/hotel-capacity') // API endpoint for hotel capacity data
+                    .then(response => response.json())
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            const formattedData = data.map(hotel => ({
+                                hotel_name: `${hotel.chainName} (ID: ${hotel.hotelID})`,
+                                single_count: hotel.single_count,
+                                double_count: hotel.double_count,
+                                family_count: hotel.family_count,
+                                suite_count: hotel.suite_count,
+                                total_rooms:
+                                    Number(hotel.single_count) +
+                                    Number(hotel.double_count) +
+                                    Number(hotel.family_count) +
+                                    Number(hotel.suite_count),
+                            }));
+
+                            setHotelData(formattedData);
+                        } else {
+                            console.error('Invalid API response:', data);
+                            setHotelData([]);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching hotel data:', error);
+                        setHotelData([]);
+                    });
+            }, []);
+
+            const handleHotelChange = (event) => {
+                setSelectedHotel(event.target.value);
+            };
+
+            const filteredData = selectedHotel === "All Hotels"
+                ? hotelData
+                : selectedHotel
+                    ? hotelData.filter(hotel => hotel.hotel_name === selectedHotel)
+                    : [];
+
+            return (
+                <div className="hotel-status-container">
+                    <h2>Hotel Room Status</h2>
+
+                    <div className="dropdown-container">
+                        <label htmlFor="hotel-select">Select Hotel: </label>
+                        <select id="hotel-select" value={selectedHotel} onChange={handleHotelChange}>
+                            <option value="">Select a Hotel</option>
+                            <option value="All Hotels">All Hotels</option>
+                            {hotelData.map((hotel, index) => (
+                                <option key={index} value={hotel.hotel_name}>{hotel.hotel_name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {selectedHotel !== "" && (
+                        <div className="table-container">
+                            {filteredData.length > 0 ? (
+                                <table className="hotel-status-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Hotel Name</th>
+                                            <th>Single Rooms</th>
+                                            <th>Double Rooms</th>
+                                            <th>Family Rooms</th>
+                                            <th>Suite Rooms</th>
+                                            <th>Total Rooms</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredData.map((hotel, index) => (
+                                            <tr key={index}>
+                                                <td>{hotel.hotel_name}</td>
+                                                <td>{hotel.single_count}</td>
+                                                <td>{hotel.double_count}</td>
+                                                <td>{hotel.family_count}</td>
+                                                <td>{hotel.suite_count}</td>
+                                                <td>{hotel.total_rooms}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <p>No data available for the selected hotel.</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // SearchRooms Component
+        function SearchRooms() {
+            const [cities, setCities] = useState([]);
+            const [selectedCity, setSelectedCity] = useState('');
+            const [rooms, setRooms] = useState([]);
+
+            useEffect(() => {
+                fetch('http://localhost:5001/available-rooms')
+                    .then(response => response.json())
+                    .then(data => {
+                        const uniqueCities = [...new Set(data.map(room => room.hotel_city))];
+                        setCities(uniqueCities);
+                    })
+                    .catch(error => console.error('Error fetching cities:', error));
+            }, []);
+
+            useEffect(() => {
+                if (selectedCity) {
+                    fetch(`http://localhost:5001/available-rooms?city=${selectedCity}`)
+                        .then(response => response.json())
+                        .then(data => setRooms(data))
+                        .catch(error => console.error('Error fetching rooms:', error));
+                }
+            }, [selectedCity]);
+
+            return (
+                <div className="search-rooms-container">
+                    <h2> Available Rooms by City</h2>
+                    <select onChange={(e) => setSelectedCity(e.target.value)} className="city-dropdown">
+                        <option value="">Select a City</option>
+                        {cities.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                        ))}
+                    </select>
+
+                    {rooms.length > 0 && (
+                        <table className="room-table">
+                            <thead>
+                                <tr>
+                                    <th>Street</th>
+                                    <th>Available Rooms</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rooms.map(room => (
+                                    <tr key={room.hotel_streetname}>
+                                        <td>{room.hotel_streetname}</td>
+                                        <td>{room.available_rooms}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(
+            <div>
+                <HotelStatus />
+                <SearchRooms />
+            </div>,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+
+</html>

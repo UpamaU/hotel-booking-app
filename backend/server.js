@@ -35,6 +35,38 @@ app.get('/room', async (req, res) => {
     }  
 });
 
+// route to fetch aggregated capacity per hotel
+app.get('/hotel-capacity', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT * FROM aggregated_capacity_per_hotel;');
+      res.json(result.rows);
+  } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+  }
+});
+
+// route to fetch available rooms per area, filtered by city
+app.get('/available-rooms', async (req, res) => {
+  try {
+      const { city } = req.query; 
+
+      let query = 'SELECT * FROM available_rooms_per_area';
+      let values = [];
+
+      if (city) {
+          query += ' WHERE hotel_city = $1';
+          values.push(city);
+      }
+
+      const result = await pool.query(query, values);
+      res.json(result.rows);
+  } catch (err) {
+      console.error('Error fetching rooms:', err);
+      res.status(500).send("Server error");
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

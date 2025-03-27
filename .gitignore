@@ -8,3 +8,4 @@ backend/dist/
 
 # Other potential ignores
 .DS_Store
+node_modules
