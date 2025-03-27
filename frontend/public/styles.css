@@ -136,17 +136,6 @@ body {
     border-radius: 12px;
   }
   
-
-  .login-button {
-    background-color: #454545;
-    color: white;               /* <-- make the text white */
-    padding: 14px 24px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-  }
   .hero-image {
     width: 100%;
     max-width: 900px;  /* Make it larger than before */
@@ -161,17 +150,7 @@ body {
     padding: 0;
     background: #fff;
   }
-  
- 
-  
-  .login-button {
-    background: #454545;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 500;
-  }
-  
+
   .hero-section {
     padding: 60px;
   }
@@ -323,15 +302,7 @@ body {
     height: 60px;
   }
  
-  
-  .login-btn {
-    padding: 14px 24px;
-    background: #454545;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+
   
   .rooms-section {
     padding: 64px 80px;
@@ -456,14 +427,7 @@ body {
     color: #333;
     font-weight: 500;
   }
-  
-  .login-button {
-    background-color: #454545;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
+
   
   
   /* Booking Confirmation Section */
@@ -509,18 +473,7 @@ body {
     font-size: 20px;
     font-weight: 500;
   }
-  
-  .login-btn {
-    padding: 14px 24px;
-    background: #454545;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  
+
   .contact-section {
     max-width: 960px;
     margin: 0 auto;
@@ -644,15 +597,6 @@ body {
     font-weight: 500;
   }
   
-  .login-btn {
-    background-color: #454545;
-    color: #ffffff;
-    padding: 14px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-  }
   
   /* About section */
   .about-section {

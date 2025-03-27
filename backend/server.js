@@ -26,14 +26,48 @@ pool.connect()
 
 //  API Route to Fetch Rooms
 app.get('/room', async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM room;'); // Fetch all rooms
-      res.json(result.rows);
-    } catch (error) {
-      console.error('Error fetching rooms:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }  
+  try {
+    const result = await pool.query(`
+      SELECT 
+        room.*, 
+        hotel."hotelid", 
+        hotel."chainName" AS chainname, 
+        hotel."hotel_city" AS hotel_city, 
+        hotel."hotel_country" AS hotel_country, 
+        hotel."hotel_streetname" AS hotel_streetname, 
+        hotel."hotel_streetnumber" AS hotel_streetnumber, 
+        hotel."category" AS category
+      FROM room
+      JOIN hotel ON room.hotelid = hotel.hotelid;
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching room data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
+// API Route to fetch all hotels
+app.get('/hotel', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        hotelid, 
+        "chainName" AS chainname, 
+        "hotel_city" AS hotel_city, 
+        "hotel_country" AS hotel_country, 
+        "hotel_streetname" AS hotel_streetname, 
+        "hotel_streetnumber" AS hotel_streetnumber, 
+        "category" AS category
+      FROM hotel;
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching hotels:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 // route to fetch aggregated capacity per hotel
 app.get('/hotel-capacity', async (req, res) => {
