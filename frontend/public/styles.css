@@ -749,3 +749,23 @@ body {
 .room-table th {
   background-color: #f4f4f4;
 }
+
+.logins_header {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.logins_form {
+  margin:auto; 
+  padding: 25px;
+  width: 20%;
+}
+
+.logins_form_box {
+  display: flex;
+  gap: 32px;
+  padding: 40px 80px;
+  flex-wrap: wrap;
+  margin: auto;
+}
