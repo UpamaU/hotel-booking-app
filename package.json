@@ -2,10 +2,9 @@
     "name": "hotel-booking-app",
     "version": "1.0.0",
     "scripts": {
-      "start": "concurrently \"npm run start --prefix frontend\" \"npm run start --prefix backend\""
+        "start": "concurrently \"npm run start --prefix frontend\" \"npm run start --prefix backend\""
     },
     "devDependencies": {
-      "concurrently": "^7.0.0"
+        "concurrently": "^7.6.0"
     }
-  }
-  
+}
