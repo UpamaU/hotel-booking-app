@@ -24,18 +24,20 @@
 
 
   <!-- Username and Password boxes -->
-  <section class="rooms-section">
-    <h1 class = "logins_header">Create Account</h1>
+  <section class="logins_section">
+    <div class="logins_grid">
+      <h1 class = "logins_header">Create an Account</h1>
+    </div>
 
-    <div class="room-grid">
+    <div class="logins_grid">
       <!-- Customer -->
-      <div class="room-card">
-        <form action="/action_page.php">
-          <label for="fname">Username:</label>
-          <input type="text" id="username" name="username"><br><br>
-          <label for="lname">Password:</label>
-          <input type="text" id="password" name="password"><br><br>
-          <input type="submit" value="Submit">
+      <div class="room-card" class = "logins_form_box">
+        <form action="profile.html" class = "logins_form">
+          <label for="fname" class = "logins_subheader">Username:</label>
+          <input type="text" id="username" name="username" class = "logins_textbox"><br><br>
+          <label for="lname" class = "logins_subheader">Password:</label>
+          <input type="text" id="password" name="password" class = "logins_textbox"><br><br>
+          <input type="submit" value="Submit" class = "btn" style = "margin: auto;">
         </form>
       </div>
     </div>

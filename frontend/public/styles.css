@@ -753,13 +753,13 @@ body {
 .logins_header {
   font-size: 32px;
   font-weight: 600;
-  margin-bottom: 32px;
+  margin-bottom: 45px;
 }
 
 .logins_form {
   margin:auto; 
-  padding: 25px;
-  width: 20%;
+  padding: 100px;
+  height: 60%;
 }
 
 .logins_form_box {
@@ -768,4 +768,30 @@ body {
   padding: 40px 80px;
   flex-wrap: wrap;
   margin: auto;
+  height: 120%;
+
+}
+
+.logins_subheader {
+  gap: 36px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+}
+
+.logins_textbox {
+  margin: auto;
+  height: 15%;
+  width: 45%;
+
+}
+.logins_grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin: auto;
+  width: 50%;
+}
+
+.logins_section {
+  padding: 64px 80px;
+  margin-left: auto;
 }
