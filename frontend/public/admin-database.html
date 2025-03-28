@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Admin Database Management</title>
+    <style>
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            flex-grow: 1;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-actions button {
+            flex-grow: 1;
+            margin: 0 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-actions button:nth-child(2) {
+            background-color: #28a745;
+        }
+
+        .form-actions button:last-child {
+            background-color: #dc3545;
+        }
+
+        .search-results {
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-results table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .search-results th, .search-results td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .search-results tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .search-results tr:hover {
+            background-color: #ddd;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <header class="navbar">
+        <a href="index.html">
+            <img src="images/logo.png" alt="E-Hotel Logo" class="logo" />
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="room.html">Rooms</a>
+            <a href="about.html">About Us</a>
+            <a href="profile.html">Profile</a>
+            <a href="login.htm"><button class="login-button">Login</button></a>
+            <a href="hotel-statistics.html" >Hotel Statistics</a> 
+            <a href="admin-database.html" >Admin Database</a> 
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Admin Database</h1>
+        
+        <!-- customer section -->
+        <div class="section">
+            <h2>Manage Customers</h2>
+            <div class="search-container">
+                <input type="text" id="customerSearch" placeholder="Search Customer">
+                <button onclick="searchCustomers()">Search</button>
+            </div>
+
+            <div id="customerSearchResults" class="search-results"></div>
+
+            <form id="customerForm">
+                <h3>Add / Update Customer</h3>
+                <input type="hidden" id="customerID">
+                <input type="text" id="customerFirstName" placeholder="First Name" required>
+                <input type="text" id="customerMiddleName" placeholder="Middle Name">
+                <input type="text" id="customerLastName" placeholder="Last Name" required>
+                <input type="text" id="customerStreetNumber" placeholder="Street Number">
+                <input type="text" id="customerStreetName" placeholder="Street Name">
+                <input type="text" id="customerCity" placeholder="City">
+                <input type="text" id="customerZipCode" placeholder="Zip Code">
+                <input type="text" id="customerCountry" placeholder="Country">
+                
+                <div class="form-actions">
+                    <button type="button" onclick="addCustomer()">Add Customer</button>
+                    <button type="button" onclick="updateCustomer()">Update Customer</button>
+                    <button type="button" onclick="deleteCustomer()">Delete Customer</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- employee section -->
+        <div class="section">
+            <h2>Manage Employees</h2>
+            <div class="search-container">
+                <input type="text" id="employeeSearch" placeholder="Search Employee">
+                <button onclick="searchEmployees()">Search</button>
+            </div>
+
+            <div id="employeeSearchResults" class="search-results"></div>
+
+            <form id="employeeForm">
+                <h3>Add / Update Employee</h3>
+                <input type="hidden" id="employeeID">
+                <input type="text" id="employeeSSN" placeholder="SSN/SIN" required>
+                <input type="text" id="employeeFirstName" placeholder="First Name" required>
+                <input type="text" id="employeeMiddleName" placeholder="Middle Name">
+                <input type="text" id="employeeLastName" placeholder="Last Name" required>
+                <input type="text" id="employeeStreetNumber" placeholder="Street Number">
+                <input type="text" id="employeeStreetName" placeholder="Street Name">
+                <input type="text" id="employeeCity" placeholder="City">
+                <input type="text" id="employeeZipCode" placeholder="Zip Code">
+                <input type="text" id="employeeCountry" placeholder="Country">
+                <input type="text" id="employeeRole" placeholder="Role">
+                
+                <div class="form-actions">
+                    <button type="button" onclick="addEmployee()">Add Employee</button>
+                    <button type="button" onclick="updateEmployee()">Update Employee</button>
+                    <button type="button" onclick="deleteEmployee()">Delete Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // customer search function
+        async function searchCustomers() {
+            const searchTerm = document.getElementById('customerSearch').value;
+            try {
+                const response = await fetch(`http://localhost:5001/customers?search=${searchTerm}`);
+                const customers = await response.json();
+                displayCustomerResults(customers);
+            } catch (error) {
+                console.error('Error searching customers:', error);
+                alert('Error searching customers');
+            }
+        }
+
+        // display customer search results
+        function displayCustomerResults(customers) {
+            const resultsDiv = document.getElementById('customerSearchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (customers.length === 0) {
+                resultsDiv.innerHTML = '<p>No customers found</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>City</th>
+                    <th>Country</th>
+                </tr>
+            `;
+
+            customers.forEach(customer => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${customer.customerID}</td>
+                    <td>${customer.customer_firstName}</td>
+                    <td>${customer.customer_lastName}</td>
+                    <td>${customer.customer_city}</td>
+                    <td>${customer.customer_country}</td>
+                `;
+                row.onclick = () => populateCustomerForm(customer);
+            });
+
+            resultsDiv.appendChild(table);
+        }
+
+        // populate customer form
+        function populateCustomerForm(customer) {
+            document.getElementById('customerID').value = customer.customerID;
+            document.getElementById('customerFirstName').value = customer.customer_firstName;
+            document.getElementById('customerMiddleName').value = customer.customer_middleName || '';
+            document.getElementById('customerLastName').value = customer.customer_lastName;
+            document.getElementById('customerStreetNumber').value = customer.customer_streetNumber || '';
+            document.getElementById('customerStreetName').value = customer.customer_streetName || '';
+            document.getElementById('customerCity').value = customer.customer_city;
+            document.getElementById('customerZipCode').value = customer.customer_zipcode;
+            document.getElementById('customerCountry').value = customer.customer_country;
+        }
+
+        // ddd customer function
+        async function addCustomer() {
+        // validateing required fields
+        const firstName = document.getElementById('customerFirstName').value.trim();
+        const lastName = document.getElementById('customerLastName').value.trim();
+
+        if (!firstName || !lastName) {
+            alert('Please fill in all required fields (First Name, Last Name)');
+            return;
+        }
+
+        const newCustomer = {
+            customer_firstName: firstName,
+            customer_middlename: document.getElementById('customerMiddleName').value || null,
+            customer_lastname: lastName,
+            customer_streetnumber: document.getElementById('customerStreetNumber').value || null,
+            customer_streetname: document.getElementById('customerStreetName').value || null,
+            customer_city: document.getElementById('customerCity').value || null,
+            customer_zipcode: document.getElementById('customerZipCode').value || null,
+            customer_country: document.getElementById('customerCountry').value || null,
+        };
+
+        try {
+            const response = await fetch('http://localhost:5001/customers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCustomer)
+            });
+
+            if (response.ok) {
+            const result = await response.json();
+            alert(`Customer added successfully with ID: ${result.customerID}`);
+            resetCustomerForm();
+            } else {
+            const errorData = await response.json();
+            alert(`Failed to add customer: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error adding customer:', error);
+            alert('Error adding customer');
+        }
+        }
+
+        // reset form after successful addition
+        function resetCustomerForm() {
+        document.getElementById('customerForm').reset();
+        document.getElementById('customerID').value = ''; // clears any existing ID
+        }
+
+        // update customer function
+        async function updateCustomer() {
+            const customerID = document.getElementById('customerID').value;
+            if (!customerID) {
+                alert('Please search and select a customer to update');
+                return;
+            }
+
+            const updatedCustomer = {
+                customer_firstName: document.getElementById('customerFirstName').value,
+                customer_middlename: document.getElementById('customerMiddleName').value || null,
+                customer_lastname: document.getElementById('customerLastName').value,
+                customer_streetnumber: document.getElementById('customerStreetNumber').value || null,
+                customer_streetname: document.getElementById('customerStreetName').value || null,
+                customer_city: document.getElementById('customerCity').value,
+                customer_zipcode: document.getElementById('customerZipCode').value,
+                customer_country: document.getElementById('customerCountry').value
+            };
+
+            try {
+                const response = await fetch(`http://localhost:5001/customers/${customerID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedCustomer)
+                });
+
+                if (response.ok) {
+                alert('Customer updated successfully');
+                resetCustomerForm();
+                } else {
+                const errorData = await response.json();
+                alert(`Failed to update customer: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error updating customer:', error);
+                alert('Error updating customer');
+            }
+            }
+
+        // delete customer function
+        async function deleteCustomer() {
+        const customerID = document.getElementById('customerID').value;
+        if (!customerID) {
+            alert('Please search and select a customer to delete');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return;
+
+        try {
+            const response = await fetch(`http://localhost:5001/customers/${customerID}`, {
+            method: 'DELETE'
+            });
+
+            if (response.ok) {
+            alert('Customer deleted successfully');
+            resetCustomerForm();
+            } else {
+            const errorData = await response.json();
+            alert(`Failed to delete customer: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            alert('Error deleting customer');
+        }
+        }
+
+        //  reset the form
+        function resetCustomerForm() {
+        document.getElementById('customerForm').reset();
+        document.getElementById('customerID').value = ''; // clear any existing ID
+        }
+
+        // reset customer form
+        function resetCustomerForm() {
+            document.getElementById('customerForm').reset();
+            document.getElementById('customerID').value = '';
+        }
+
+        // employee search function
+        async function searchEmployees() {
+            const searchTerm = document.getElementById('employeeSearch').value;
+            try {
+                const response = await fetch(`http://localhost:5001/employees?search=${searchTerm}`);
+                const employees = await response.json();
+                displayEmployeeResults(employees);
+            } catch (error) {
+                console.error('Error searching employees:', error);
+                alert('Error searching employees');
+            }
+        }
+
+        // display employee search results
+        function displayEmployeeResults(employees) {
+            const resultsDiv = document.getElementById('employeeSearchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (employees.length === 0) {
+                resultsDiv.innerHTML = '<p>No employees found</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>SSN/SIN</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>City</th>
+                </tr>
+            `;
+
+            employees.forEach(employee => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${employee.employeeid}</td>
+                    <td>${employee.ssn_sin}</td>
+                    <td>${employee.employee_firstname}</td>
+                    <td>${employee.employee_lastname}</td>
+                    <td>${employee.employee_city}</td>
+                `;
+                row.onclick = () => populateEmployeeForm(employee);
+            });
+
+            resultsDiv.appendChild(table);
+        }
+
+        // populate employee form
+        function populateEmployeeForm(employee) {
+            document.getElementById('employeeID').value = employee.employeeid;
+            document.getElementById('employeeSSN').value = employee.ssn_sin;
+            document.getElementById('employeeFirstName').value = employee.employee_firstname;
+            document.getElementById('employeeMiddleName').value = employee.employee_middlename || '';
+            document.getElementById('employeeLastName').value = employee.employee_lastname;
+            document.getElementById('employeeStreetNumber').value = employee.employee_streetnumber || '';
+            document.getElementById('employeeStreetName').value = employee.employee_streetname || '';
+            document.getElementById('employeeCity').value = employee.employee_city;
+            document.getElementById('employeeZipCode').value = employee.employee_zipcode || '';
+            document.getElementById('employeeCountry').value = employee.employee_country;
+        }
+
+        // add employee function
+        async function addEmployee() {
+            // alidate required fields
+            const ssn = document.getElementById('employeeSSN').value.trim();
+            const firstName = document.getElementById('employeeFirstName').value.trim();
+            const lastName = document.getElementById('employeeLastName').value.trim();
+            if (!ssn || !firstName || !lastName) {
+                alert('Please fill in all required fields (SSN, First Name, Last Name)');
+                return;
+            }
+
+            const newEmployee = {
+                ssn_sin: ssn,
+                employee_firstname: firstName,
+                employee_middlename: document.getElementById('employeeMiddleName').value || null,
+                employee_lastname: lastName,
+                employee_streetnumber: document.getElementById('employeeStreetNumber').value || null,
+                employee_streetname: document.getElementById('employeeStreetName').value || null,
+                employee_city: document.getElementById('employeeCity').value || null,
+                employee_zipcode: document.getElementById('employeeZipCode').value || null,
+                employee_country: document.getElementById('employeeCountry').value || null,
+                employee_role: document.getElementById('employeeRole').value || null
+            };
+
+            try {
+                const response = await fetch('http://localhost:5001/employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newEmployee)
+                });
+                
+                const responseText = await response.text();
+                
+                if (response.ok) {
+                    try {
+                        const result = JSON.parse(responseText);
+                        alert(`Employee added successfully! Employee ID: ${result.employeeId}`);
+                        resetEmployeeForm();
+                    } catch {
+                        alert('Employee added successfully!');
+                        resetEmployeeForm();
+                    }
+                } else {
+                    console.error('Add employee error response:', responseText);
+                    alert(`Failed to add employee: ${responseText}`);
+                }
+            } catch (error) {
+                console.error('Error adding employee:', error);
+                alert(`Network error: ${error.message}`);
+            }
+        }
+
+        // update employee function
+        async function updateEmployee() {
+            const employeeID = document.getElementById('employeeID').value;
+            if (!employeeID) {
+                alert('Please search and select an employee to update');
+                return;
+            }
+
+            const updatedEmployee = {
+                employeeid: employeeID,
+                ssn_sin: document.getElementById('employeeSSN').value,
+                employee_firstname: document.getElementById('employeeFirstName').value,
+                employee_middlename: document.getElementById('employeeMiddleName').value || null,
+                employee_lastname: document.getElementById('employeeLastName').value,
+                employee_streetnumber: document.getElementById('employeeStreetNumber').value || null,
+                employee_streetname: document.getElementById('employeeStreetName').value || null,
+                employee_city: document.getElementById('employeeCity').value | null,
+                employee_zipcode: document.getElementById('employeeZipCode').value || null,
+                employee_country: document.getElementById('employeeCountry').value || null,
+                employee_role: document.getElementById('employeeRole').value || null
+            };
+
+            try {
+                const response = await fetch(`http://localhost:5001/employees/${employeeID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedEmployee)
+                });
+                
+                if (response.ok) {
+                    alert('Employee updated successfully');
+                    resetEmployeeForm();
+                } else {
+                    alert('Failed to update employee');
+                }
+            } catch (error) {
+                console.error('Error updating employee:', error);
+                alert('Error updating employee');
+            }
+        }
+
+        // delet employee function
+        async function deleteEmployee() {
+            const employeeID = document.getElementById('employeeID').value;
+            if (!employeeID) {
+                alert('Please search and select an employee to delete');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this employee?')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5001/employees/${employeeID}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Employee deleted successfully');
+                    resetEmployeeForm();
+                } else {
+                    alert('Failed to delete employee');
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Error deleting employee');
+            }
+        }
+
+        // erset employee form
+        function resetEmployeeForm() {
+            document.getElementById('employeeForm').reset();
+            document.getElementById('employeeID').value = '';
+        }
+    </script>
+</body>
+</html>
