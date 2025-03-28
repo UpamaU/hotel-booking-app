@@ -66,6 +66,16 @@ app.get('/hotel', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+app.get('/booking', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM booking`);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ error: 'Could not fetch bookings.' });
+  }
+});
+
 
 
 

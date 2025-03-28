@@ -79,12 +79,58 @@
         <option value="yes">Yes</option>
         <option value="no">No</option>
       </select>
-      <select id="countryFilter">
-        <option value="">Country</option>
-        <option value="Canada">Canada</option>
-        <option value="Mexico">Mexico</option>
-        <option value="USA">USA</option>
+      <select id="areaFilter">
+        <option value="">Area</option>
+        <option value="New York - 5th Avenue">New York - 5th Avenue</option>
+        <option value="Los Angeles - Sunset Blvd">Los Angeles - Sunset Blvd</option>
+        <option value="San Francisco - Market Street">San Francisco - Market Street</option>
+        <option value="Toronto - Bay Street">Toronto - Bay Street</option>
+        <option value="Vancouver - Robson Street">Vancouver - Robson Street</option>
+        <option value="Chicago - Michigan Ave">Chicago - Michigan Ave</option>
+        <option value="Montreal - Saint-Laurent">Montreal - Saint-Laurent</option>
+        <option value="Mexico City - Reforma Avenue">Mexico City - Reforma Avenue</option>
+        <option value="Houston - Main Street">Houston - Main Street</option>
+        <option value="Seattle - Broadway">Seattle - Broadway</option>
+        <option value="Denver - Colfax Ave">Denver - Colfax Ave</option>
+        <option value="Austin - Congress Ave">Austin - Congress Ave</option>
+        <option value="Toronto - Yonge Street">Toronto - Yonge Street</option>
+        <option value="Ottawa - Bank Street">Ottawa - Bank Street</option>
+        <option value="Las Vegas - Fremont Street">Las Vegas - Fremont Street</option>
+        <option value="Vancouver - Queen Street">Vancouver - Queen Street</option>
+        <option value="Miami - Collins Ave">Miami - Collins Ave</option>
+        <option value="Miami - Ocean Drive">Miami - Ocean Drive</option>
+        <option value="New York - Central Park West">New York - Central Park West</option>
+        <option value="San Francisco - Lombard Street">San Francisco - Lombard Street</option>
+        <option value="Los Angeles - Wilshire Blvd">Los Angeles - Wilshire Blvd</option>
+        <option value="New York - Fifth Avenue">New York - Fifth Avenue</option>
+        <option value="Toronto - King Street">Toronto - King Street</option>
+        <option value="Montreal - Sherbrooke Street">Montreal - Sherbrooke Street</option>
+        <option value="Toronto - Bloor Street">Toronto - Bloor Street</option>
+        <option value="Montreal - Rue Sainte-Catherine">Montreal - Rue Sainte-Catherine</option>
+        <option value="Vancouver - Granville Street">Vancouver - Granville Street</option>
+        <option value="Boston - Newbury Street">Boston - Newbury Street</option>
+        <option value="Miami - Lincoln Road">Miami - Lincoln Road</option>
+        <option value="Austin - Congress Street">Austin - Congress Street</option>
+        <option value="New York - Broadway">New York - Broadway</option>
+        <option value="San Diego - Downtown Street">San Diego - Downtown Street</option>
+        <option value="San Francisco - Union Street">San Francisco - Union Street</option>
+        <option value="New York - Wall Street">New York - Wall Street</option>
+        <option value="Vancouver - Main Street">Vancouver - Main Street</option>
+        <option value="Atlanta - Peachtree Street">Atlanta - Peachtree Street</option>
+        <option value="Dallas - Main Avenue">Dallas - Main Avenue</option>
+        <option value="Philadelphia - South Street">Philadelphia - South Street</option>
       </select>
+      <select id="categoryFilter">
+        <option value="">Category</option>
+        <option value="1">★</option>
+        <option value="2">★★</option>
+        <option value="3">★★★</option>
+        <option value="4">★★★★</option>
+        <option value="5">★★★★★</option>
+      </select>
+      <input type="date" id="dateFilter" />
+
+      
                
     </div>
 
@@ -100,8 +146,11 @@
       view: '',
       chain: '',
       extendable: '',
-      country: ''
+      area: '',
+      category: '',
+      date:''
     };
+
 
     const capacityImages = {
       Single: 'images/Single.jpeg',
@@ -121,7 +170,10 @@
           (!filters.view || card.dataset.view === filters.view) &&
           (!filters.chain || card.dataset.chain === filters.chain) &&
           (!filters.extendable || card.dataset.extendable === filters.extendable)&&
-          (!filters.country || card.dataset.country === filters.country);
+          (!filters.area || card.dataset.area === filters.area)&&
+          (!filters.category || card.dataset.category === filters.category)&&
+          (!filters.date || card.dataset.date === filters.date);
+
         card.style.display = matches ? 'block' : 'none';
       });
     };
@@ -129,6 +181,7 @@
     let hotelsById = {};
 
     const fetchHotelsAndRooms = async () => {
+      
       try {
         // Fetch hotel data first
         const hotelRes = await fetch('http://localhost:5001/hotel');
@@ -143,7 +196,38 @@
         const roomRes = await fetch('http://localhost:5001/room');
         const rooms = await roomRes.json();
 
+        const bookingRes = await fetch('http://localhost:5001/booking');
+        const bookings = await bookingRes.json();
+
+        // Example: log each booking
+        bookings.forEach(booking => {
+          console.log(`Room ${booking.roomid} is booked from ${booking.startdate} to ${booking.enddate}`);
+        });
+
+
         roomGrid.innerHTML = '';
+        function isRoomBookedOnDate(roomid, selectedDate, bookings) {
+          if (!selectedDate) return false; // No date selected → show room
+
+          const selected = new Date(selectedDate);
+          selected.setHours(0, 0, 0, 0); // Normalize selected date
+
+          // Loop through bookings → only look at this room
+          return bookings.some(b => {
+            if (b.roomID !== roomid || !b.startdate || !b.enddate) return false;
+
+            const start = new Date(b.startdate);
+            const end = new Date(b.enddate);
+
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+
+            // If selected date falls in the booking window → it's booked
+            return selected >= start && selected <= end;
+          });
+        }
+
+
 
         rooms.forEach(room => {
           const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
@@ -152,7 +236,16 @@
           
 
           const card = document.createElement('div');
+          const area = hotel?.hotel_city && hotel?.hotel_streetname? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`: '';
+          card.dataset.area = area;
+          card.dataset.category = hotel?.category?.toString() || '';
+
           card.className = 'room-card';
+          if (filters.date && isRoomBookedOnDate(room.roomid, filters.date, bookings)) {
+            return; // skip rendering this room
+          }
+
+
 
           card.dataset.capacity = room.capacity;
           card.dataset.chain = hotel?.chainname?.trim() || 'Unknown';
@@ -173,7 +266,8 @@
           <h2 class="room-subheading">${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
           <p class="room-text">
             Capacity: ${room.capacity}<br/>
-            Category: ${hotel?.category || 'N/A'}<br/>
+            Price: $${Number(room.price).toFixed(2)}<br/>
+            Category: ${hotel?.category ? '★'.repeat(hotel.category) : 'Unrated'}<br/>
             Sea View: ${room.seaview ? 'Yes' : 'No'}<br/>
             Mountain View: ${room.mountainview ? 'Yes' : 'No'}<br/>
             Chain: ${hotel?.chainname || 'Unknown'}<br/>
@@ -209,10 +303,21 @@
       filters.extendable = e.target.value;
       applyFilters();
     });
-    document.getElementById('countryFilter').addEventListener('change', e => {
-      filters.country = e.target.value;
+    document.getElementById('areaFilter').addEventListener('change', e => {
+      filters.area = e.target.value;
       applyFilters();
     });
+    document.getElementById('categoryFilter').addEventListener('change', e => {
+      filters.category = e.target.value;
+      applyFilters();
+    });
+    document.getElementById('dateFilter').addEventListener('change', e => {
+      filters.date = e.target.value;
+      applyFilters();
+    });
+
+
+
 
     fetchHotelsAndRooms();
   </script>  
