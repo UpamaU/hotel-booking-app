@@ -60,7 +60,7 @@
           if (response.ok) {
             const data = await response.json();
             alert(data.message);
-            window.location.href = 'customer-profile.html';  // Redirect on successful login
+            window.location.href = 'profile.html';  // Redirect on successful login
           } else {
             const errorData = await response.json();
             alert(`Error: ${errorData.error}`);
