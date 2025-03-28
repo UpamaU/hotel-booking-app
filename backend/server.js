@@ -52,19 +52,26 @@ app.get('/room', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-// API Route to fetch all hotels
+
+// API Route to fetch all hotels with all attributes
 app.get('/hotel', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT 
-        hotelid, 
-        "chainName" AS chainname, 
-        "hotel_city" AS hotel_city, 
-        "hotel_country" AS hotel_country, 
-        "hotel_streetname" AS hotel_streetname, 
-        "hotel_streetnumber" AS hotel_streetnumber, 
-        "category" AS category
-      FROM hotel;
+      SELECT
+        hotelid,
+        "chainName" AS chain_name,
+        numberofrooms AS number_of_rooms,
+        hotel_streetnumber AS hotel_street_number,
+        hotel_streetname AS hotel_street_name,
+        hotel_city AS hotel_city,
+        hotel_zipcode AS hotel_zipcode,
+        hotel_country AS hotel_country,
+        managerid AS manager_id,
+        category AS category,
+        hotel_phone AS hotel_phone,
+        "hotel_emailAddress" AS hotel_email
+      FROM hotel
+      ORDER BY hotelid;
     `);
     res.json(result.rows);
   } catch (error) {
@@ -72,6 +79,7 @@ app.get('/hotel', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 app.get('/booking', async (req, res) => {
   try {
     const result = await pool.query(`SELECT * FROM booking`);
