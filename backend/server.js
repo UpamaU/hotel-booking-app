@@ -1,11 +1,17 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const bodyParser = require('body-parser');
 
 const app = express();
+
+//middleware
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 
 const pool = new Pool({
@@ -415,6 +421,22 @@ app.delete("/employees/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Mock Login Credentials
+const validUsername = '123';
+const validPassword = '123';
+
+//-------------------- Employee Login - username and password are hardcoded --------------------//
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === "123" && password === "123") {
+    res.status(200).json({ message: "Login successful!" });
+  } else {
+    res.status(401).json({ error: "Invalid username or password" });
+  }
+});
+
 
 
 // Start the server
