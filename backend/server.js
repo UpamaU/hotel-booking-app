@@ -422,7 +422,7 @@ app.delete("/employees/:id", async (req, res) => {
   }
 });
 
-// Mock Login Credentials
+// Mock Login Credentials for employee
 const validUsername = '123';
 const validPassword = '123';
 
@@ -436,6 +436,22 @@ app.post("/login", (req, res) => {
     res.status(401).json({ error: "Invalid username or password" });
   }
 });
+
+// Mock Login Credentials for customer
+const validCustomerUsername = '321';
+const validCustomerPassword = '321';
+
+//-------------------- Customer Login --------------------//
+app.post("/customer-login", (req, res) => {
+  const { username1, password1 } = req.body;
+
+  if (username1 === validCustomerUsername && password1 === validCustomerPassword) {
+    res.status(200).json({ message: "Customer login successful!" });
+  } else {
+    res.status(401).json({ error: "Invalid customer username or password" });
+  }
+});
+
 
 
 
