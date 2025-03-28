@@ -795,3 +795,53 @@ body {
   padding: 64px 80px;
   margin-left: auto;
 }
+
+.admin-container {
+  width: 80%;
+  margin: auto;
+  text-align: center;
+}
+
+.section-container {
+  background: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  padding: 10px;
+  font-size: 16px;
+  margin: 5px;
+  width: 80%;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.form-container {
+  background: #f9f9f9;
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+h3 {
+  margin-bottom: 10px;
+}
