@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+
+
     .filter-group {
       display: flex;
       gap: 20px;
@@ -47,88 +49,113 @@
 
     <!-- Filter Section -->
     <div class="filter-group">
-      <select id="capacityFilter" required>
-        <option value="">Capacity</option>
-        <option value="Single">Single</option>
-        <option value="Double">Double</option>
-        <option value="Family">Family</option>
-        <option value="Suite">Suite</option>
-      </select>
+      <div class="filter-item">
+     
+        <select id="capacityFilter">
+          <option value="">Capacity</option>
+          <option value="Single">Single</option>
+          <option value="Double">Double</option>
+          <option value="Family">Family</option>
+          <option value="Suite">Suite</option>
+        </select>
+      </div>
+    
+      <div class="filter-item">
+        <select id="viewFilter">
+          <option value="">View</option>
+          <option value="sea">Sea</option>
+          <option value="mountain">Mountain</option>
+          <option value="both">Both</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+    
+      <div class="filter-item">
+        <select id="chainFilter">
+          <option value="">Hotel Chain</option>
+          <option value="Luxury Stays">Luxury Stays</option>
+          <option value="Budget Inns">Budget Inns</option>
+          <option value="Elite Resorts">Elite Resorts</option>
+          <option value="Urban Hotels">Urban Hotels</option>
+          <option value="Travel Comfort">Travel Comfort</option>
+        </select>
+      </div>
+    
+      <div class="filter-item">
+        <select id="extendableFilter">
+          <option value="">Extendable</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    
+      <div class="filter-item">
+        <select id="areaFilter">
+          <option value="">Area</option>
+          <option value="New York - 5th Avenue">New York - 5th Avenue</option>
+          <option value="Los Angeles - Sunset Blvd">Los Angeles - Sunset Blvd</option>
+          <option value="San Francisco - Market Street">San Francisco - Market Street</option>
+          <option value="Toronto - Bay Street">Toronto - Bay Street</option>
+          <option value="Vancouver - Robson Street">Vancouver - Robson Street</option>
+          <option value="Chicago - Michigan Ave">Chicago - Michigan Ave</option>
+          <option value="Montreal - Saint-Laurent">Montreal - Saint-Laurent</option>
+          <option value="Mexico City - Reforma Avenue">Mexico City - Reforma Avenue</option>
+          <option value="Houston - Main Street">Houston - Main Street</option>
+          <option value="Seattle - Broadway">Seattle - Broadway</option>
+          <option value="Denver - Colfax Ave">Denver - Colfax Ave</option>
+          <option value="Austin - Congress Ave">Austin - Congress Ave</option>
+          <option value="Toronto - Yonge Street">Toronto - Yonge Street</option>
+          <option value="Ottawa - Bank Street">Ottawa - Bank Street</option>
+          <option value="Las Vegas - Fremont Street">Las Vegas - Fremont Street</option>
+          <option value="Vancouver - Queen Street">Vancouver - Queen Street</option>
+          <option value="Miami - Collins Ave">Miami - Collins Ave</option>
+          <option value="Miami - Ocean Drive">Miami - Ocean Drive</option>
+          <option value="New York - Central Park West">New York - Central Park West</option>
+          <option value="San Francisco - Lombard Street">San Francisco - Lombard Street</option>
+          <option value="Los Angeles - Wilshire Blvd">Los Angeles - Wilshire Blvd</option>
+          <option value="New York - Fifth Avenue">New York - Fifth Avenue</option>
+          <option value="Toronto - King Street">Toronto - King Street</option>
+          <option value="Montreal - Sherbrooke Street">Montreal - Sherbrooke Street</option>
+          <option value="Toronto - Bloor Street">Toronto - Bloor Street</option>
+          <option value="Montreal - Rue Sainte-Catherine">Montreal - Rue Sainte-Catherine</option>
+          <option value="Vancouver - Granville Street">Vancouver - Granville Street</option>
+          <option value="Boston - Newbury Street">Boston - Newbury Street</option>
+          <option value="Miami - Lincoln Road">Miami - Lincoln Road</option>
+          <option value="Austin - Congress Street">Austin - Congress Street</option>
+          <option value="New York - Broadway">New York - Broadway</option>
+          <option value="San Diego - Downtown Street">San Diego - Downtown Street</option>
+          <option value="San Francisco - Union Street">San Francisco - Union Street</option>
+          <option value="New York - Wall Street">New York - Wall Street</option>
+          <option value="Vancouver - Main Street">Vancouver - Main Street</option>
+          <option value="Atlanta - Peachtree Street">Atlanta - Peachtree Street</option>
+          <option value="Dallas - Main Avenue">Dallas - Main Avenue</option>
+          <option value="Philadelphia - South Street">Philadelphia - South Street</option>
+        </select>
+      </div>
 
-      <select id="viewFilter" required>
-        <option value="">View</option>
-        <option value="sea">Sea</option>
-        <option value="mountain">Mountain</option>
-        <option value="both">Both</option>
-        <option value="none">None</option>
-      </select>
+      <div class="filter-item">
+        <select id="categoryFilter">
+          <option value="">Category</option>
+          <option value="1">★</option>
+          <option value="2">★★</option>
+          <option value="3">★★★</option>
+          <option value="4">★★★★</option>
+          <option value="5">★★★★★</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="startDateFilter">Start Date</label>
+        <input type="date" id="startDateFilter" />
+      </div>
+
+      <div class="filter-item">
+        <label for="endDateFilter">End Date</label>
+        <input type="date" id="endDateFilter" />
+      </div>
       
 
-      <select id="chainFilter" required>
-        <option value="">Hotel Chain</option>
-        <option value="Luxury Stays">Luxury Stays</option>
-        <option value="Budget Inns">Budget Inns</option>
-        <option value="Elite Resorts">Elite Resorts</option>
-        <option value="Urban Hotels">Urban Hotels</option>
-        <option value="Travel Comfort">Travel Comfort</option>
-      </select>
       
-
-      <select id="extendableFilter">
-        <option value="">Extendable</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-      <select id="areaFilter">
-        <option value="">Area</option>
-        <option value="New York - 5th Avenue">New York - 5th Avenue</option>
-        <option value="Los Angeles - Sunset Blvd">Los Angeles - Sunset Blvd</option>
-        <option value="San Francisco - Market Street">San Francisco - Market Street</option>
-        <option value="Toronto - Bay Street">Toronto - Bay Street</option>
-        <option value="Vancouver - Robson Street">Vancouver - Robson Street</option>
-        <option value="Chicago - Michigan Ave">Chicago - Michigan Ave</option>
-        <option value="Montreal - Saint-Laurent">Montreal - Saint-Laurent</option>
-        <option value="Mexico City - Reforma Avenue">Mexico City - Reforma Avenue</option>
-        <option value="Houston - Main Street">Houston - Main Street</option>
-        <option value="Seattle - Broadway">Seattle - Broadway</option>
-        <option value="Denver - Colfax Ave">Denver - Colfax Ave</option>
-        <option value="Austin - Congress Ave">Austin - Congress Ave</option>
-        <option value="Toronto - Yonge Street">Toronto - Yonge Street</option>
-        <option value="Ottawa - Bank Street">Ottawa - Bank Street</option>
-        <option value="Las Vegas - Fremont Street">Las Vegas - Fremont Street</option>
-        <option value="Vancouver - Queen Street">Vancouver - Queen Street</option>
-        <option value="Miami - Collins Ave">Miami - Collins Ave</option>
-        <option value="Miami - Ocean Drive">Miami - Ocean Drive</option>
-        <option value="New York - Central Park West">New York - Central Park West</option>
-        <option value="San Francisco - Lombard Street">San Francisco - Lombard Street</option>
-        <option value="Los Angeles - Wilshire Blvd">Los Angeles - Wilshire Blvd</option>
-        <option value="New York - Fifth Avenue">New York - Fifth Avenue</option>
-        <option value="Toronto - King Street">Toronto - King Street</option>
-        <option value="Montreal - Sherbrooke Street">Montreal - Sherbrooke Street</option>
-        <option value="Toronto - Bloor Street">Toronto - Bloor Street</option>
-        <option value="Montreal - Rue Sainte-Catherine">Montreal - Rue Sainte-Catherine</option>
-        <option value="Vancouver - Granville Street">Vancouver - Granville Street</option>
-        <option value="Boston - Newbury Street">Boston - Newbury Street</option>
-        <option value="Miami - Lincoln Road">Miami - Lincoln Road</option>
-        <option value="Austin - Congress Street">Austin - Congress Street</option>
-        <option value="New York - Broadway">New York - Broadway</option>
-        <option value="San Diego - Downtown Street">San Diego - Downtown Street</option>
-        <option value="San Francisco - Union Street">San Francisco - Union Street</option>
-        <option value="New York - Wall Street">New York - Wall Street</option>
-        <option value="Vancouver - Main Street">Vancouver - Main Street</option>
-        <option value="Atlanta - Peachtree Street">Atlanta - Peachtree Street</option>
-        <option value="Dallas - Main Avenue">Dallas - Main Avenue</option>
-        <option value="Philadelphia - South Street">Philadelphia - South Street</option>
-      </select>
-      <select id="categoryFilter">
-        <option value="">Category</option>
-        <option value="1">★</option>
-        <option value="2">★★</option>
-        <option value="3">★★★</option>
-        <option value="4">★★★★</option>
-        <option value="5">★★★★★</option>
-      </select>
-      <input type="date" id="dateFilter" />
 
       
                
@@ -148,7 +175,8 @@
       extendable: '',
       area: '',
       category: '',
-      date:''
+      startDate:'',
+      endDate:''
     };
 
 
@@ -172,7 +200,8 @@
           (!filters.extendable || card.dataset.extendable === filters.extendable)&&
           (!filters.area || card.dataset.area === filters.area)&&
           (!filters.category || card.dataset.category === filters.category)&&
-          (!filters.date || card.dataset.date === filters.date);
+          (!filters.startDate || card.dataset.date === filters.date);
+          (!filters.endDate || card.dataset.date === filters.date);
 
         card.style.display = matches ? 'block' : 'none';
       });
@@ -206,33 +235,31 @@
 
 
         roomGrid.innerHTML = '';
-        function isRoomBookedOnDate(roomid, selectedDate, bookings) {
-          if (!selectedDate) return false; // No date selected → show room
+        function isRoomBookedInRange(roomid, selectedStart, selectedEnd, bookings) {
+          const selStart = new Date(selectedStart);
+          const selEnd = new Date(selectedEnd);
+          selStart.setHours(0, 0, 0, 0);
+          selEnd.setHours(0, 0, 0, 0);
 
-          const selected = new Date(selectedDate);
-          selected.setHours(0, 0, 0, 0); // Normalize selected date
-
-          // Loop through bookings → only look at this room
           return bookings.some(b => {
-            if (b.roomID !== roomid || !b.startdate || !b.enddate) return false;
+            if (b.roomid !== roomid || !b.startdate || !b.enddate) return false;
 
-            const start = new Date(b.startdate);
-            const end = new Date(b.enddate);
+            const bookStart = new Date(b.startdate);
+            const bookEnd = new Date(b.enddate);
+            bookStart.setHours(0, 0, 0, 0);
+            bookEnd.setHours(0, 0, 0, 0);
 
-            start.setHours(0, 0, 0, 0);
-            end.setHours(0, 0, 0, 0);
-
-            // If selected date falls in the booking window → it's booked
-            return selected >= start && selected <= end;
+            return selStart <= bookEnd && selEnd >= bookStart; // overlaps
           });
         }
+
 
 
 
         rooms.forEach(room => {
           const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
 
-          const hotel = hotelsById[room.hotelid]; // 👈 Match room to hotel
+          const hotel = hotelsById[room.hotelid]; // 👈 Match room to hotels
           
 
           const card = document.createElement('div');
@@ -241,10 +268,11 @@
           card.dataset.category = hotel?.category?.toString() || '';
 
           card.className = 'room-card';
-          if (filters.date && isRoomBookedOnDate(room.roomid, filters.date, bookings)) {
+          if (filters.startDate && filters.endDate && isRoomBookedInRange(room.roomid, filters.startDate, filters.endDate, bookings)) {
             return; // skip rendering this room
           }
 
+ 
 
 
           card.dataset.capacity = room.capacity;
@@ -311,8 +339,13 @@
       filters.category = e.target.value;
       applyFilters();
     });
-    document.getElementById('dateFilter').addEventListener('change', e => {
-      filters.date = e.target.value;
+    document.getElementById('startDateFilter').addEventListener('change', e => {
+      filters.startDate = e.target.value;
+      applyFilters();
+    });
+
+    document.getElementById('endDateFilter').addEventListener('change', e => {
+      filters.endDate = e.target.value;
       applyFilters();
     });
 
