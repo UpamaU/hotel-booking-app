@@ -219,6 +219,7 @@
             </form>
         </div>
 
+
         <!-- Room section -->
         <div class="section">
             <h2>Manage Rooms</h2>
@@ -231,35 +232,29 @@
                 <h3>Add / Update Room</h3>
                 <input type="hidden" id="roomID">
                 <input type="number" id="roomNumber" placeholder="Room Number" required>
-                <input type="number" id="price" placeholder="Price">
+                <input type="number" id="price" placeholder="Price ($)">
                 <input type="text" id="capacity" placeholder="Capacity">
                 <input type="text" id="viewType" placeholder="View Type">
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="extendable">
-                    <label for="extendable">Extendable</label>
-                </div>
-                
-                <textarea id="amenities" placeholder="Amenities"></textarea>
-                <textarea id="probStatus" placeholder="Problem Status"></textarea>
+                <select id="extendableSelect">
+                    <option value="false">Not Extendable</option>
+                    <option value="true">Extendable</option>
+                </select>
+                <input type="text" id="amenities" placeholder="Amenities">
+                <input type="text" id="probStatus" placeholder="Problem Status">
                 <input type="number" id="roomHotelID" placeholder="Hotel ID" required>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="seaView">
-                    <label for="seaView">Sea View</label>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="mountainView">
-                    <label for="mountainView">Mountain View</label>
-                </div>
-                
-                <textarea id="damages" placeholder="Damages"></textarea>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="isBooked">
-                    <label for="isBooked">Is Booked</label>
-                </div>
+                <select id="seaViewSelect">
+                    <option value="false">No Sea View</option>
+                    <option value="true">Sea View</option>
+                </select>
+                <select id="mountainViewSelect">
+                    <option value="false">No Mountain View</option>
+                    <option value="true">Mountain View</option>
+                </select>
+                <input type="text" id="damages" placeholder="Damages">
+                <select id="isBookedSelect">
+                    <option value="false">Available</option>
+                    <option value="true">Booked</option>
+                </select>
                 
                 <div class="form-actions">
                     <button type="button" onclick="addRoom()">Add Room</button>
@@ -876,27 +871,34 @@
             }
 
             const table = document.createElement('table');
+            table.className = 'results-table';
             table.innerHTML = `
-                <tr>
-                    <th>ID</th>
-                    <th>Room Number</th>
-                    <th>Hotel</th>
-                    <th>Price</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Room Number</th>
+                        <th>Hotel</th>
+                        <th>Price</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
             `;
+            
+            const tbody = table.querySelector('tbody');
 
             rooms.forEach(room => {
-                const row = table.insertRow();
+                const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${room.roomid}</td>
-                    <td>${room.roomnumber || ''}</td>
+                    <td>${room.roomNumber || ''}</td>
                     <td>${room.chainname || ''} (${room.hotel_city || ''})</td>
-                    <td>${room.price || ''}</td>
+                    <td>$${room.price || '0'}</td>
                     <td>${room.capacity || ''}</td>
                     <td>${room.is_booked ? 'Booked' : 'Available'}</td>
                 `;
+                row.className = 'clickable-row';
                 row.onclick = () => populateRoomForm(room);
             });
 
@@ -906,18 +908,18 @@
         // populate room form with selected room data
         function populateRoomForm(room) {
             document.getElementById('roomID').value = room.roomid;
-            document.getElementById('roomNumber').value = room.roomnumber || '';
+            document.getElementById('roomNumber').value = room.roomNumber || '';
             document.getElementById('price').value = room.price || '';
             document.getElementById('capacity').value = room.capacity || '';
-            document.getElementById('viewType').value = room.viewtype || '';
-            document.getElementById('extendable').checked = room.extendable || false;
+            document.getElementById('viewType').value = room.viewType || '';
+            document.getElementById('extendableSelect').value = room.extendable ? 'true' : 'false';
             document.getElementById('amenities').value = room.amenities || '';
-            document.getElementById('probStatus').value = room.probstatus || '';
+            document.getElementById('probStatus').value = room.probStatus || '';
             document.getElementById('roomHotelID').value = room.hotelid || '';
-            document.getElementById('seaView').checked = room.seaview || false;
-            document.getElementById('mountainView').checked = room.mountainview || false;
+            document.getElementById('seaViewSelect').value = room.seaview ? 'true' : 'false';
+            document.getElementById('mountainViewSelect').value = room.mountainview ? 'true' : 'false';
             document.getElementById('damages').value = room.damages || '';
-            document.getElementById('isBooked').checked = room.is_booked || false;
+            document.getElementById('isBookedSelect').value = room.is_booked ? 'true' : 'false';
         }
 
         // add room function
@@ -931,19 +933,26 @@
                 return;
             }
 
+            // format amenities as a postgresql array string, need this so rooms can be added witjout error
+            let amenitiesValue = document.getElementById('amenities').value || null;
+            if (amenitiesValue) {
+                // If it's a comma-separated string,(which it will show up as on the ui) format it as postgresql array
+                amenitiesValue = '{' + amenitiesValue + '}';
+            }
+
             const newRoom = {
                 roomnumber: roomNumber,
                 price: document.getElementById('price').value || null,
                 capacity: document.getElementById('capacity').value || null,
                 viewtype: document.getElementById('viewType').value || null,
-                extendable: document.getElementById('extendable').checked,
-                amenities: document.getElementById('amenities').value || null,
+                extendable: document.getElementById('extendableSelect').value === 'true',
+                amenities: amenitiesValue,
                 probstatus: document.getElementById('probStatus').value || null,
                 hotelid: hotelID,
-                seaview: document.getElementById('seaView').checked,
-                mountainview: document.getElementById('mountainView').checked,
+                seaview: document.getElementById('seaViewSelect').value === 'true',
+                mountainview: document.getElementById('mountainViewSelect').value === 'true',
                 damages: document.getElementById('damages').value || null,
-                is_booked: document.getElementById('isBooked').checked
+                is_booked: document.getElementById('isBookedSelect').value === 'true'
             };
 
             try {
@@ -977,19 +986,26 @@
                 return;
             }
 
+            // format amenities as a postgresql array string, need this so rooms can be added witjout error
+            let amenitiesValue = document.getElementById('amenities').value || null;
+            if (amenitiesValue) {
+                // If it's a comma-separated string,(which it will show up as on the ui) format it as postgresql array
+                amenitiesValue = '{' + amenitiesValue + '}';
+            }
+            
             const updatedRoom = {
                 roomnumber: document.getElementById('roomNumber').value,
                 price: document.getElementById('price').value || null,
                 capacity: document.getElementById('capacity').value || null,
                 viewtype: document.getElementById('viewType').value || null,
-                extendable: document.getElementById('extendable').checked,
-                amenities: document.getElementById('amenities').value || null,
+                extendable: document.getElementById('extendableSelect').value === 'true',
+                amenities: amenitiesValue,
                 probstatus: document.getElementById('probStatus').value || null,
                 hotelid: document.getElementById('roomHotelID').value,
-                seaview: document.getElementById('seaView').checked,
-                mountainview: document.getElementById('mountainView').checked,
+                seaview: document.getElementById('seaViewSelect').value === 'true',
+                mountainview: document.getElementById('mountainViewSelect').value === 'true',
                 damages: document.getElementById('damages').value || null,
-                is_booked: document.getElementById('isBooked').checked
+                is_booked: document.getElementById('isBookedSelect').value === 'true'
             };
 
             try {
