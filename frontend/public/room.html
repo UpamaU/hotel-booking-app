@@ -187,10 +187,7 @@
         Double: 'images/Double.jpeg',
         Family: 'images/Family.jpeg',
         Suite: 'images/Suite.jpeg'
-      };
-
-      // Make bookRoom function globally available
-      // Update the bookRoom function to ensure all parameters are properly logged and sent
+        };
       window.bookRoom = async (roomID, roomNumber) => {
         // First, validate parameters
         if (roomID === undefined || roomNumber === undefined) {
@@ -199,12 +196,23 @@
           return;
         }
         
-        // Get dates from the date inputs or use defaults
-        const startDate = document.getElementById('startDateFilter').value || new Date().toISOString().split("T")[0];
-        let endDate = document.getElementById('endDateFilter').value;
-        if (!endDate) {
-          const defaultEnd = new Date(new Date(startDate).getTime() + 86400000); // +1 day
-          endDate = defaultEnd.toISOString().split("T")[0];
+        // Get dates from the date inputs
+        const startDate = document.getElementById('startDateFilter').value;
+        const endDate = document.getElementById('endDateFilter').value;
+        
+        // Validate that both dates are selected
+        if (!startDate || !endDate) {
+          alert('Please select both start and end dates before booking.');
+          return;
+        }
+        
+        // Validate that end date is after start date
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        
+        if (endDateObj <= startDateObj) {
+          alert('End date must be after start date.');
+          return;
         }
         
         // For demo purposes, using a fixed customer ID
@@ -241,7 +249,7 @@
           console.error("Booking error:", error);
           alert(`Booking failed: ${error.message}`);
         }
-      };
+    };
 
       // Helper function to format dates
       const formatDate = (dateStr) => {
