@@ -699,6 +699,7 @@ app.post("/book-room", async (req, res) => {
   try {
     const { customerID, roomID, roomNumber, startdate, enddate } = req.body;
 
+    // Validate fields
     if (!customerID || !roomID || !roomNumber || !startdate || !enddate) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -716,6 +717,7 @@ app.post("/book-room", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+
 
 
 // Start the server

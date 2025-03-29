@@ -94,7 +94,9 @@
       <option value="5">★★★★★</option>
     </select>
 
-    <input type="date" id="dateFilter" />
+    <!-- Two date filters: start date and end date -->
+    <input type="date" id="startDateFilter" />
+    <input type="date" id="endDateFilter" />
   </div>
 
   <!-- Room Grid -->
@@ -102,6 +104,7 @@
 </main>
 
 <script>
+  // Update filters object to include both start and end dates.
   const filters = {
     capacity: '',
     view: '',
@@ -109,7 +112,8 @@
     extendable: '',
     area: '',
     category: '',
-    date: ''
+    startDate: '',
+    endDate: ''
   };
 
   const capacityImages = {
@@ -122,23 +126,25 @@
   const roomGrid = document.getElementById('roomGrid');
   let hotelsById = {};
 
+  // Updated applyFilters to include startDate and endDate
   const applyFilters = () => {
-    const roomCards = document.querySelectorAll('.room-card');
-    const isAnyFilterActive = Object.values(filters).some(val => val !== '');
+  const roomCards = document.querySelectorAll('.room-card');
+  const isAnyFilterActive = Object.values(filters).some(val => val !== '');
 
-    roomCards.forEach(card => {
-      const matches = 
-        (!filters.capacity || card.dataset.capacity === filters.capacity) &&
-        (!filters.view || card.dataset.view === filters.view) &&
-        (!filters.chain || card.dataset.chain === filters.chain) &&
-        (!filters.extendable || card.dataset.extendable === filters.extendable) &&
-        (!filters.area || card.dataset.area === filters.area) &&
-        (!filters.category || card.dataset.category === filters.category) &&
-        (!filters.date || card.dataset.date === filters.date);
+  roomCards.forEach(card => {
+    const matches = 
+      (!filters.capacity || card.dataset.capacity === filters.capacity) &&
+      (!filters.view || card.dataset.view === filters.view) &&
+      (!filters.chain || card.dataset.chain.toLowerCase().trim() === filters.chain.toLowerCase().trim()) &&
+      (!filters.extendable || card.dataset.extendable === filters.extendable) &&
+      (!filters.area || card.dataset.area.toLowerCase().trim() === filters.area.toLowerCase().trim()) &&
+      (!filters.category || card.dataset.category === filters.category);
+      // The startDate and endDate conditions have been removed.
 
-      card.style.display = (isAnyFilterActive && matches) ? 'block' : 'none';
-    });
-  };
+    card.style.display = (isAnyFilterActive && matches) ? 'block' : 'none';
+  });
+};
+
 
   const fetchHotelsAndRooms = async () => {
     try {
@@ -182,6 +188,10 @@
         card.dataset.area = area;
         card.dataset.category = hotel?.category?.toString() || '';
 
+        // Here we assign placeholder available dates. Replace these with actual data if available.
+        card.dataset.startDate = '2025-04-01';
+        card.dataset.endDate = '2025-04-05';
+
         card.innerHTML = `
           <img src="${imgSrc}" alt="${room.capacity} Room" class="room-image" />
           <h2>${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
@@ -192,7 +202,7 @@
             Location: ${hotel?.hotel_streetnumber || ''} ${hotel?.hotel_streetname || ''}, ${hotel?.hotel_city || ''}, ${hotel?.hotel_country || ''}
           </p>
           <div style="text-align: right; padding: 0 16px 16px;">
-            <button onclick="bookRoom(${room.roomid}, ${room.roomnumber}, 1, '2025-04-01', '2025-04-05')">Book</button>
+            <button onclick="bookRoom(${room.roomid}, ${room.roomnumber})">Book</button>
           </div>
         `;
         roomGrid.appendChild(card);
@@ -204,32 +214,37 @@
     }
   };
 
+  // Book room function with hardcoded customerID and current date values.
   const bookRoom = async (roomID, roomNumber) => {
-  const today = new Date().toISOString().split("T")[0]; // Format YYYY-MM-DD
-  const customerID = 101; // Hardcoded customer ID
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    const customerID = "101"; // Hardcoded customer ID
 
-  try {
-    const res = await fetch("http://localhost:5001/book-room", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customerID, roomID, roomNumber, startdate: today, enddate: today })
-    });
+    try {
+      const res = await fetch("http://localhost:5001/book-room", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerID, roomID, roomNumber, startdate: today, enddate: today })
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      alert(`Booking successful! ID: ${data.bookingID}`);
-    } else {
-      alert(`Booking failed: ${data.error}`);
+      const data = await res.json();
+      if (res.ok) {
+        alert(`Booking successful! ID: ${data.bookingID}`);
+      } else {
+        alert(`Booking failed: ${data.error}`);
+      }
+    } catch (error) {
+      alert("Booking failed due to a network error.");
     }
-  } catch (error) {
-    alert("Booking failed due to a network error.");
-  }
-};
+  };
 
-
+  // Add event listeners for all filter inputs
   document.querySelectorAll('.filter-group select, .filter-group input').forEach(filter => {
     filter.addEventListener('change', e => {
-      filters[e.target.id.replace('Filter', '').toLowerCase()] = e.target.value;
+      // Get the filter key from the element's ID (e.g., "capacityFilter" => "capacity")
+      const key = e.target.id.replace('Filter', '');
+      // Lowercase first letter to match our filters object keys (e.g., "startDate" remains "startDate")
+      const filterKey = key.charAt(0).toLowerCase() + key.slice(1);
+      filters[filterKey] = e.target.value;
       applyFilters();
     });
   });
