@@ -53,10 +53,13 @@ app.get('/room', async (req, res) => {
   }
 });
 
-// API Route to fetch all hotels with all attributes
+// Hotel Routes for CRUD operations
+
+// Fetch Hotels with search capability
 app.get('/hotel', async (req, res) => {
   try {
-    const result = await pool.query(`
+    const search = req.query.search?.trim(); // Trim any whitespace
+    let sql = `
       SELECT
         hotelid,
         "chainName" AS chain_name,
@@ -71,12 +74,171 @@ app.get('/hotel', async (req, res) => {
         hotel_phone AS hotel_phone,
         "hotel_emailAddress" AS hotel_email
       FROM hotel
-      ORDER BY hotelid;
-    `);
+    `;
+    let values = [];
+    
+    if (search) {
+      // Use parameterized query with multiple conditions
+      sql += ` WHERE 
+        "chainName" ILIKE $1 OR 
+        "hotel_city" ILIKE $1 OR 
+        "hotel_country" ILIKE $1 OR
+        "hotelid"::TEXT ILIKE $1`;
+      values.push(`%${search}%`);
+    }
+    
+    sql += ` ORDER BY hotelid`;
+    
+    const result = await pool.query(sql, values);
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching hotels:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ 
+      message: 'Error fetching hotels', 
+      error: error.message 
+    });
+  }
+});
+
+// Add a new Hotel
+app.post('/hotel', async (req, res) => {
+  try {
+    const {
+      chain_name,
+      number_of_rooms,
+      hotel_street_number,
+      hotel_street_name,
+      hotel_city,
+      hotel_zipcode,
+      hotel_country,
+      manager_id,
+      category,
+      hotel_phone,
+      hotel_email
+    } = req.body;
+
+    const sql = `
+      INSERT INTO hotel
+      ("chainName", numberofrooms,
+      hotel_streetnumber, hotel_streetname, hotel_city,
+      hotel_zipcode, hotel_country, managerid,
+      category, hotel_phone, "hotel_emailAddress")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING hotelid
+    `;
+
+    const values = [
+      chain_name,
+      number_of_rooms,
+      hotel_street_number,
+      hotel_street_name,
+      hotel_city,
+      hotel_zipcode,
+      hotel_country,
+      manager_id,
+      category,
+      hotel_phone,
+      hotel_email
+    ];
+
+    const result = await pool.query(sql, values);
+    res.status(201).json({ hotelid: result.rows[0].hotelid });
+  } catch (err) {
+    console.error('Error adding hotel:', err);
+    res.status(500).json({ 
+      message: 'Error adding hotel', 
+      error: err.message 
+    });
+  }
+});
+
+// Update an existing Hotel
+app.put('/hotel/:id', async (req, res) => {
+  try {
+    const hotelid = req.params.id;
+    const {
+      chain_name,
+      number_of_rooms,
+      hotel_street_number,
+      hotel_street_name,
+      hotel_city,
+      hotel_zipcode,
+      hotel_country,
+      manager_id,
+      category,
+      hotel_phone,
+      hotel_email
+    } = req.body;
+
+    const sql = `
+      UPDATE hotel
+      SET "chainName" = $1,
+          numberofrooms = $2,
+          hotel_streetnumber = $3,
+          hotel_streetname = $4,
+          hotel_city = $5,
+          hotel_zipcode = $6,
+          hotel_country = $7,
+          managerid = $8,
+          category = $9,
+          hotel_phone = $10,
+          "hotel_emailAddress" = $11
+      WHERE hotelid = $12
+    `;
+
+    const values = [
+      chain_name,
+      number_of_rooms,
+      hotel_street_number,
+      hotel_street_name,
+      hotel_city,
+      hotel_zipcode,
+      hotel_country,
+      manager_id,
+      category,
+      hotel_phone,
+      hotel_email,
+      hotelid
+    ];
+
+    const result = await pool.query(sql, values);
+    
+    // Check if any rows were actually updated
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    res.status(200).json({ message: 'Hotel updated successfully' });
+  } catch (err) {
+    console.error('Error updating hotel:', err);
+    res.status(500).json({ 
+      message: 'Error updating hotel', 
+      error: err.message 
+    });
+  }
+});
+
+// Delete a Hotel
+app.delete('/hotel/:id', async (req, res) => {
+  try {
+    const hotelid = req.params.id;
+    const sql = 'DELETE FROM hotel WHERE hotelid = $1 RETURNING *';
+    const result = await pool.query(sql, [hotelid]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    res.status(200).json({ 
+      message: 'Hotel deleted successfully', 
+      deletedHotel: result.rows[0] 
+    });
+  } catch (err) {
+    console.error('Error deleting hotel:', err);
+    res.status(500).json({ 
+      message: 'Error deleting hotel', 
+      error: err.message 
+    });
   }
 });
 
@@ -278,16 +440,22 @@ app.delete("/customers/:id", async (req, res) => {
   }
 });
 
-// 🔎 Fetch All Employees
+// Fetch All Employees
 app.get("/employees", async (req, res) => {
   try {
     const search = req.query.search;
-    let sql = "SELECT * FROM employee";
+    let sql = `
+      SELECT e.*, er.role 
+      FROM employee e
+      LEFT JOIN employee_role er ON e.employeeid = er.employeeid
+    `;
     let values = [];
+    
     if (search) {
-      sql += ` WHERE employee_firstname ILIKE $1 OR employee_lastname ILIKE $1 OR employeeid::TEXT ILIKE $1`;
+      sql += ` WHERE e.employee_firstname ILIKE $1 OR e.employee_lastname ILIKE $1 OR e.employeeid::TEXT ILIKE $1`;
       values.push(`%${search}%`);
     }
+    
     const result = await pool.query(sql, values);
     res.json(result.rows);
   } catch (err) {
@@ -307,11 +475,13 @@ app.post("/employees", async (req, res) => {
     employee_streetname, 
     employee_city, 
     employee_zipcode, 
-    employee_country, 
-    role 
+    employee_country,
+    employee_role 
   } = req.body;
   
   try {
+    await pool.query('BEGIN');
+    
     const result = await pool.query(
       "INSERT INTO employee (ssn_sin, employee_firstname, employee_middlename, employee_lastname, employee_streetnumber, employee_streetname, employee_city, employee_zipcode, employee_country) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING employeeid",
       [ssn_sin, employee_firstname, employee_middlename, employee_lastname, employee_streetnumber, employee_streetname, employee_city, employee_zipcode, employee_country]
@@ -319,15 +489,33 @@ app.post("/employees", async (req, res) => {
     
     const employeeId = result.rows[0].employeeid;
     
-    if (role) {
+    if (employee_role) {  
       await pool.query(
         "INSERT INTO employee_role (employeeid, role) VALUES ($1, $2)",
-        [employeeId, role]
+        [employeeId, employee_role]  
       );
     }
     
-    res.status(201).json({ message: "Employee added successfully", employeeId });
+
+    await pool.query('COMMIT');
+    
+    // getting the complete employee with role data
+    const completeEmployee = await pool.query(
+      `SELECT e.*, er.role 
+       FROM employee e 
+       LEFT JOIN employee_role er ON e.employeeid = er.employeeid 
+       WHERE e.employeeid = $1`,
+      [employeeId]
+    );
+    
+    res.status(201).json({ 
+      message: "Employee added successfully", 
+      employeeId: employeeId, // we want to see the employeeId
+      employee: completeEmployee.rows[0] 
+    });
   } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error("Error adding employee:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -377,39 +565,57 @@ app.put("/employees/:id", async (req, res) => {
     employee_city, 
     employee_zipcode, 
     employee_country, 
-    role 
+    employee_role  
   } = req.body;
   
   try {
+    await pool.query('BEGIN');
+    
     await pool.query(
       "UPDATE employee SET ssn_sin=$1, employee_firstname=$2, employee_middlename=$3, employee_lastname=$4, employee_streetnumber=$5, employee_streetname=$6, employee_city=$7, employee_zipcode=$8, employee_country=$9 WHERE employeeid=$10",
       [ssn_sin, employee_firstname, employee_middlename, employee_lastname, employee_streetnumber, employee_streetname, employee_city, employee_zipcode, employee_country, id]
     );
 
-    if (role) {
-      // Check if an employee_role already exists
+    if (employee_role !== undefined) {  
+      // checks if an employee_role already exists
       const existingRole = await pool.query(
         "SELECT * FROM employee_role WHERE employeeid=$1",
         [id]
       );
 
       if (existingRole.rows.length > 0) {
-        // Update existing role
+        // update existing role
         await pool.query(
           "UPDATE employee_role SET role=$1 WHERE employeeid=$2",
-          [role, id]
+          [employee_role, id] 
         );
       } else {
-        // Insert new role
+        // insert new role
         await pool.query(
           "INSERT INTO employee_role (employeeid, role) VALUES ($1, $2)",
-          [id, role]
+          [id, employee_role]  
         );
       }
     }
-
-    res.json({ message: "Employee updated successfully" });
+    
+    await pool.query('COMMIT');
+    
+    // get  updated employee with role
+    const updatedEmployee = await pool.query(
+      `SELECT e.*, er.role 
+       FROM employee e 
+       LEFT JOIN employee_role er ON e.employeeid = er.employeeid 
+       WHERE e.employeeid = $1`,
+      [id]
+    );
+    
+    res.json({ 
+      message: "Employee updated successfully", 
+      employee: updatedEmployee.rows[0] 
+    });
   } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error("Error updating employee:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -418,14 +624,43 @@ app.put("/employees/:id", async (req, res) => {
 app.delete("/employees/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    // First, delete the role association
+    await pool.query('BEGIN');
+    
+    //  delete the role association
     await pool.query("DELETE FROM employee_role WHERE employeeid=$1", [id]);
     
-    // Then, delete the employee
+    // then delete the employee
     await pool.query("DELETE FROM employee WHERE employeeid=$1", [id]);
+    
+    await pool.query('COMMIT');
     
     res.json({ message: "Employee deleted successfully" });
   } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// gettign employee by ID
+app.get("/employees/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT e.*, er.role 
+       FROM employee e 
+       LEFT JOIN employee_role er ON e.employeeid = er.employeeid 
+       WHERE e.employeeid = $1`,
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching employee:", error);
     res.status(500).json({ error: error.message });
   }
 });
