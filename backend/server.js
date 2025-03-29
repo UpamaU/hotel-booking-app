@@ -1023,9 +1023,10 @@ app.get("/bookings", async (req, res) => {
   try {
     const search = req.query.search || '';
     
+    // Updated query using lowercase column names for the booking table
     let query = `
       SELECT b.bookingid, b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
-             c.customer_firstName, c.customer_lastName
+             c."customer_firstName", c."customer_lastName"
       FROM booking b
       LEFT JOIN customer c ON b."customerID" = c."customerID"
       LEFT JOIN renting r ON b.bookingid = r."bookingID"
@@ -1038,8 +1039,8 @@ app.get("/bookings", async (req, res) => {
     if (search) {
       query += ` AND (
         b.bookingid::text LIKE $1
-        OR c.customer_firstName ILIKE $1
-        OR c.customer_lastName ILIKE $1
+        OR c."customer_firstName" ILIKE $1
+        OR c."customer_lastName" ILIKE $1
         OR b."roomNumber"::text LIKE $1
       )`;
       params.push(`%${search}%`);
@@ -1054,6 +1055,8 @@ app.get("/bookings", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
 
 // Convert booking to renting
 app.post("/convert-to-renting", async (req, res) => {
@@ -1129,11 +1132,11 @@ app.get("/bookings", async (req, res) => {
     const search = req.query.search || '';
     
     let query = `
-      SELECT b.bookingid, b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
-             c.customer_firstName, c.customer_lastName
+      SELECT b."bookingID", b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
+             c."customer_firstName", c."customer_lastName"
       FROM booking b
       LEFT JOIN customer c ON b."customerID" = c."customerID"
-      LEFT JOIN renting r ON b.bookingid = r."bookingID"
+      LEFT JOIN renting r ON b."bookingID" = r."bookingID"
       WHERE r."bookingID" IS NULL AND b.bookingstatus = 'Confirmed'
     `;
     
