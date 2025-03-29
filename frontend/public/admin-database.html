@@ -219,6 +219,73 @@
             </form>
         </div>
 
+<!-- Add this to your HTML file, inside the appropriate tab or section -->
+<div id="bookingRentingTab" class="tab-content">
+    <h2>Convert Booking to Renting</h2>
+    
+    <!-- Booking Search Section -->
+    <div class="search-section">
+      <h3>Search Bookings</h3>
+      <div class="form-group">
+        <input type="text" id="bookingSearch" placeholder="Search by ID, customer name, or room" class="search-input">
+        <button onclick="searchBookings()">Search</button>
+      </div>
+      <div id="bookingSearchResults"></div>
+    </div>
+    
+        <!-- Booking to Renting Form -->
+        <div class="form-section">
+        <h3>Convert to Renting</h3>
+        <form id="rentingForm">
+            <!-- Hidden field for booking ID -->
+            <input type="hidden" id="bookingID">
+            
+            <div class="form-row">
+            <div class="form-group">
+                <label for="bookingDetails">Booking Details:</label>
+                <input type="text" id="bookingDetails" readonly>
+            </div>
+            </div>
+            
+            <div class="form-row">
+            <div class="form-group">
+                <label for="employeeID">Employee ID*:</label>
+                <input type="number" id="employeeID" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="startDate">Check-in Date:</label>
+                <input type="date" id="startDate">
+            </div>
+            
+            <div class="form-group">
+                <label for="endDate">Check-out Date:</label>
+                <input type="date" id="endDate">
+            </div>
+            </div>
+            
+            <div class="form-row">
+            <div class="form-group">
+                <label for="daysExtended">Days Extended:</label>
+                <input type="number" id="daysExtended" value="0" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentStatus">Payment Status:</label>
+                <select id="paymentStatus">
+                <option value="false">Pending</option>
+                <option value="true">Paid</option>
+                </select>
+            </div>
+            </div>
+            
+            <div class="form-actions">
+            <button type="button" onclick="convertToRenting()">Convert to Renting</button>
+            <button type="button" onclick="resetRentingForm()">Reset</button>
+            </div>
+        </form>
+        </div>
+    </div>
 
         <!-- Room section -->
         <div class="section">
@@ -1075,6 +1142,162 @@
             document.getElementById('roomForm').reset();
             document.getElementById('roomID').value = '';
         }
-    </script>
+
+            // Booking search function
+    async function searchBookings() {
+        const searchTerm = document.getElementById('bookingSearch').value;
+        try {
+            const response = await fetch(`http://localhost:5001/bookings?search=${searchTerm}`);
+            const bookings = await response.json();
+            displayBookingResults(bookings);
+        } catch (error) {
+            console.error('Error searching bookings:', error);
+            alert('Error searching bookings');
+        }
+    }
+
+    // Display booking search results
+    function displayBookingResults(bookings) {
+        const resultsDiv = document.getElementById('bookingSearchResults');
+        resultsDiv.innerHTML = '';
+        
+        if (bookings.length === 0) {
+            resultsDiv.innerHTML = '<p>No bookings found</p>';
+            return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'results-table';
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Customer</th>
+                    <th>Room</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        
+        const tbody = table.querySelector('tbody');
+
+        bookings.forEach(booking => {
+            // Only show confirmed bookings that haven't been converted to rentings yet
+            if (booking.bookingstatus === 'Confirmed') {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${booking.bookingid}</td>
+                    <td>${booking.customer_firstName || ''} ${booking.customer_lastName || ''}</td>
+                    <td>Room ${booking.roomNumber} (Hotel ${booking.roomID})</td>
+                    <td>${formatDate(booking.startdate)}</td>
+                    <td>${formatDate(booking.enddate)}</td>
+                    <td>${booking.bookingstatus}</td>
+                `;
+                row.className = 'clickable-row';
+                row.onclick = () => populateRentingForm(booking);
+            }
+        });
+
+        resultsDiv.appendChild(table);
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    }
+
+    // Populate renting form with booking data
+    function populateRentingForm(booking) {
+        document.getElementById('bookingID').value = booking.bookingid;
+        
+        // Show booking details in a readable format
+        const customerName = `${booking.customer_firstName || ''} ${booking.customer_lastName || ''}`;
+        const roomDetails = `Room ${booking.roomNumber} (Hotel ${booking.roomID})`;
+        const dateRange = `${formatDate(booking.startdate)} to ${formatDate(booking.enddate)}`;
+        
+        document.getElementById('bookingDetails').value = 
+            `Booking #${booking.bookingid}: ${customerName}, ${roomDetails}, ${dateRange}`;
+        
+        // Set default dates from booking
+        document.getElementById('startDate').value = formatDateForInput(booking.startdate);
+        document.getElementById('endDate').value = formatDateForInput(booking.enddate);
+    }
+
+    // Format date for input element (YYYY-MM-DD)
+    function formatDateForInput(dateString) {
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    }
+
+    // Convert booking to renting
+    async function convertToRenting() {
+        const bookingID = document.getElementById('bookingID').value;
+        const employeeID = document.getElementById('employeeID').value;
+        
+        if (!bookingID || !employeeID) {
+            alert('Please select a booking and enter your Employee ID');
+            return;
+        }
+        
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const daysExtended = document.getElementById('daysExtended').value;
+        const paymentStatus = document.getElementById('paymentStatus').value === 'true';
+        
+        // Calculate rental period (days)
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        const rentalPeriod = Math.ceil((endDateObj - startDateObj) / (1000 * 60 * 60 * 24));
+        
+        if (rentalPeriod < 1) {
+            alert('Error: End date must be after start date');
+            return;
+        }
+        
+        const rentingData = {
+            bookingID: parseInt(bookingID),
+            employeeID: parseInt(employeeID),
+            startDate,
+            endDate,
+            daysExtended: parseInt(daysExtended),
+            paymentStatus,
+            rentalPeriod
+        };
+        
+        try {
+            const response = await fetch('http://localhost:5001/convert-to-renting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rentingData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Success! Booking #${bookingID} converted to renting. ${result.message}`);
+                resetRentingForm();
+                searchBookings(); // Refresh the booking list
+            } else {
+                const errorData = await response.json();
+                alert(`Failed to convert booking: ${errorData.error}`);
+            }
+        } catch (error) {
+            console.error('Error converting booking to renting:', error);
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+    // Reset renting form
+    function resetRentingForm() {
+        document.getElementById('rentingForm').reset();
+        document.getElementById('bookingID').value = '';
+        document.getElementById('bookingDetails').value = '';
+    }
+        </script>
 </body>
 </html>

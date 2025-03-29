@@ -1016,6 +1016,150 @@ if (error.code === '23503') {
   }
 });
 
+//------------------renting----------------------//
+
+// Add this to your server.js file
+app.get("/bookings", async (req, res) => {
+  try {
+    const search = req.query.search || '';
+    
+    let query = `
+      SELECT b.bookingid, b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
+             c.customer_firstName, c.customer_lastName
+      FROM booking b
+      LEFT JOIN customer c ON b."customerID" = c."customerID"
+      LEFT JOIN renting r ON b.bookingid = r."bookingID"
+      WHERE r."bookingID" IS NULL AND b.bookingstatus = 'Confirmed'
+    `;
+    
+    const params = [];
+    
+    // Add search conditions if provided
+    if (search) {
+      query += ` AND (
+        b.bookingid::text LIKE $1
+        OR c.customer_firstName ILIKE $1
+        OR c.customer_lastName ILIKE $1
+        OR b."roomNumber"::text LIKE $1
+      )`;
+      params.push(`%${search}%`);
+    }
+    
+    query += ' ORDER BY b.startdate DESC';
+    
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Convert booking to renting
+app.post("/convert-to-renting", async (req, res) => {
+  try {
+    // Log the raw request body
+    console.log("Convert to renting request:", JSON.stringify(req.body));
+    
+    const { bookingID, employeeID, startDate, endDate, daysExtended, paymentStatus, rentalPeriod } = req.body;
+    
+    // Validate required fields
+    if (!bookingID || !employeeID) {
+      return res.status(400).json({ error: "Missing required fields", details: { bookingID, employeeID } });
+    }
+
+    // Check if booking exists and has 'Confirmed' status
+    const bookingCheck = await pool.query(
+      `SELECT bookingid, "roomID", "roomNumber", startdate, enddate FROM booking 
+       WHERE bookingid = $1 AND bookingstatus = 'Confirmed'`,
+      [bookingID]
+    );
+    
+    if (bookingCheck.rows.length === 0) {
+      return res.status(400).json({ error: "Booking not found or not in 'Confirmed' status" });
+    }
+
+    // Use the original booking dates if not provided
+    const booking = bookingCheck.rows[0];
+    const rentStartDate = startDate || booking.startdate;
+    const rentEndDate = endDate || booking.enddate;
+    
+    // Calculate rental period if not provided
+    const calculatedRentalPeriod = rentalPeriod || Math.ceil(
+      (new Date(rentEndDate) - new Date(rentStartDate)) / (1000 * 60 * 60 * 24)
+    );
+
+    // Insert into renting table
+    const result = await pool.query(
+      `INSERT INTO renting ("bookingID", "startDate", "endDate", "daysExtended", "paymentStatus", "rentalPeriod", "employeeID")
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "bookingID", "rentID"`,
+      [
+        bookingID, 
+        rentStartDate, 
+        rentEndDate, 
+        daysExtended || 0, 
+        paymentStatus || false, 
+        calculatedRentalPeriod,
+        employeeID
+      ]
+    );
+    
+    // Success response
+    res.json({ 
+      message: "Booking successfully converted to renting", 
+      rentingID: result.rows[0].bookingID,
+      rentID: result.rows[0].rentID
+    });
+    
+  } catch (error) {
+    console.error("Error converting booking to renting:", error);
+    
+    if (error.code === '23505') {  // Unique violation 
+      res.status(400).json({ error: "This booking has already been converted to a renting" });
+    } else if (error.code === '23503') {  // Foreign key violation
+      res.status(400).json({ error: "Invalid booking ID or employee ID" });
+    } else {
+      res.status(500).json({ error: `Database error: ${error.message}` });
+    }
+  }
+});
+
+app.get("/bookings", async (req, res) => {
+  try {
+    const search = req.query.search || '';
+    
+    let query = `
+      SELECT b.bookingid, b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
+             c.customer_firstName, c.customer_lastName
+      FROM booking b
+      LEFT JOIN customer c ON b."customerID" = c."customerID"
+      LEFT JOIN renting r ON b.bookingid = r."bookingID"
+      WHERE r."bookingID" IS NULL AND b.bookingstatus = 'Confirmed'
+    `;
+    
+    const params = [];
+    
+    // Add search conditions if provided
+    if (search) {
+      query += ` AND (
+        b.bookingid::text LIKE $1
+        OR c.customer_firstName ILIKE $1
+        OR c.customer_lastName ILIKE $1
+        OR b."roomNumber"::text LIKE $1
+      )`;
+      params.push(`%${search}%`);
+    }
+    
+    query += ' ORDER BY b.startdate DESC';
+    
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
