@@ -30,30 +30,193 @@ pool.connect()
   .catch(err => console.error('Database connection error:', err));
 // Database connection
 
-//  API Route to Fetch Rooms
+// Room Routes 
+
+// Fetch all rooms with hotel information
 app.get('/room', async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        room.*, 
+    const search = req.query.search?.trim();
+    let sql = `
+      SELECT room.*, 
         hotel."hotelid", 
         hotel."chainName" AS chainname, 
         hotel."hotel_city" AS hotel_city, 
         hotel."hotel_country" AS hotel_country, 
         hotel."hotel_streetname" AS hotel_streetname, 
         hotel."hotel_streetnumber" AS hotel_streetnumber, 
-        hotel."category" AS category
-      FROM room
-      JOIN hotel ON room.hotelid = hotel.hotelid;
-    `);
+        hotel."category" AS category 
+      FROM room 
+      JOIN hotel ON room.hotelid = hotel.hotelid
+    `;
+    let values = [];
+    
+    if (search) {
+      sql += ` WHERE 
+        room.roomid::TEXT ILIKE $1 OR 
+        room."roomNumber"::TEXT ILIKE $1 OR 
+        hotel."chainName" ILIKE $1 OR 
+        hotel."hotel_city" ILIKE $1
+      `;
+      values.push(`%${search}%`);
+    }
+    
+    sql += ` ORDER BY room.roomid`;
+    
+    const result = await pool.query(sql, values);
     res.json(result.rows);
   } catch (error) {
-    console.error('Error fetching room data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({ 
+      message: 'Error fetching rooms', 
+      error: error.message 
+    });
   }
 });
 
-// Hotel Routes for CRUD operations
+// Add a new Room
+app.post('/room', async (req, res) => {
+  try {
+    const {
+      roomnumber,
+      price,
+      capacity,
+      viewtype,
+      extendable,
+      amenities,
+      probstatus,
+      hotelid,
+      seaview,
+      mountainview,
+      damages,
+      is_booked
+    } = req.body;
+
+    const sql = `
+      INSERT INTO room
+      ("roomNumber", price, capacity, "viewType", extendable, amenities, "probStatus", hotelid, seaview, mountainview, damages, is_booked)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      RETURNING roomid
+    `;
+
+    const values = [
+      roomnumber,
+      price,
+      capacity,
+      viewtype,
+      extendable,
+      amenities,
+      probstatus,
+      hotelid,
+      seaview,
+      mountainview,
+      damages,
+      is_booked
+    ];
+
+    const result = await pool.query(sql, values);
+    res.status(201).json({ roomid: result.rows[0].roomid });
+  } catch (err) {
+    console.error('Error adding room:', err);
+    res.status(500).json({ 
+      message: 'Error adding room', 
+      error: err.message 
+    });
+  }
+});
+
+// Update an existing Room
+app.put('/room/:id', async (req, res) => {
+  try {
+    const roomid = req.params.id;
+    const {
+      roomnumber,
+      price,
+      capacity,
+      viewtype,
+      extendable,
+      amenities,
+      probstatus,
+      hotelid,
+      seaview,
+      mountainview,
+      damages,
+      is_booked
+    } = req.body;
+
+    const sql = `
+      UPDATE room
+      SET "roomNumber" = $1,
+          price = $2,
+          capacity = $3,
+          "viewType" = $4,
+          extendable = $5,
+          amenities = $6,
+          "probStatus" = $7,
+          hotelid = $8,
+          seaview = $9,
+          mountainview = $10,
+          damages = $11,
+          is_booked = $12
+      WHERE roomid = $13
+    `;
+
+    const values = [
+      roomnumber,
+      price,
+      capacity,
+      viewtype,
+      extendable,
+      amenities,
+      probstatus,
+      hotelid,
+      seaview,
+      mountainview,
+      damages,
+      is_booked,
+      roomid
+    ];
+
+    const result = await pool.query(sql, values);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    res.status(200).json({ message: 'Room updated successfully' });
+  } catch (err) {
+    console.error('Error updating room:', err);
+    res.status(500).json({ 
+      message: 'Error updating room', 
+      error: err.message 
+    });
+  }
+});
+
+// Delete a Room
+app.delete('/room/:id', async (req, res) => {
+  try {
+    const roomid = req.params.id;
+    const sql = 'DELETE FROM room WHERE roomid = $1 RETURNING *';
+    const result = await pool.query(sql, [roomid]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Room not found' });
+    }
+
+    res.status(200).json({ 
+      message: 'Room deleted successfully', 
+      deletedRoom: result.rows[0] 
+    });
+  } catch (err) {
+    console.error('Error deleting room:', err);
+    res.status(500).json({ 
+      message: 'Error deleting room', 
+      error: err.message 
+    });
+  }
+});
+
+// Hotel Routes 
 
 // Fetch Hotels with search capability
 app.get('/hotel', async (req, res) => {
@@ -314,7 +477,7 @@ app.get("/customers", async (req, res) => {
   }
 });
 
-// 🆕 Add a Customer
+// adding a customer
 app.post("/customers", async (req, res) => {
   try {
     const {
@@ -359,7 +522,7 @@ app.post("/customers", async (req, res) => {
   }
 });
 
-// 🔄 Update a Customer
+// updating a customer
 app.put("/customers/:id", async (req, res) => {
   try {
     const customerID = req.params.id;
@@ -416,7 +579,7 @@ app.put("/customers/:id", async (req, res) => {
   }
 });
 
-// ❌ Delete a Customer
+//deleting a customer
 app.delete("/customers/:id", async (req, res) => {
   try {
     const customerID = req.params.id;
