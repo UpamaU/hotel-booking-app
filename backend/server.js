@@ -875,6 +875,10 @@ app.post("/book-room", async (req, res) => {
       enddate: enddate,
       bookingstatus: bookingstatus
     });
+
+    const startDateStr = startdate; // e.g., "2025-03-30"
+    const endDateStr = enddate;     // e.g., "2025-03-31"
+    
     
     // Validate fields - strict check for roomNumber
     if (!customerID || !roomID || roomNumber === undefined || roomNumber === null || !startdate || !enddate) {
@@ -974,6 +978,7 @@ app.post("/book-room", async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING bookingid`,
       [parsedCustomerID, parsedRoomID, parsedRoomNumber, startdate, enddate, status]
     );
+    
     
     console.log("Booking successful:", result.rows[0]);
     
