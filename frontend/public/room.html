@@ -260,8 +260,8 @@
         
         // Handle possible missing data gracefully
         
-        const area = hotel?.hotel_city && hotel?.hotel_streetname
-          ? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`
+        const area = room?.hotel_city && room?.hotel_streetname
+          ? `${room.hotel_city.trim()} - ${room.hotel_streetname.trim()}`
           : '';
 
         // Create the room card
