@@ -153,6 +153,12 @@
         <label for="endDateFilter">End Date</label>
         <input type="date" id="endDateFilter" />
       </div>
+      <div class="filter-item">
+        <label style="visibility: hidden;">&nbsp;</label>
+        <button id="resetButton" class="reset-btn">Reset Filters</button>
+      </div>
+    </div> 
+
 
   <!-- Room Grid -->
   <section id="roomGrid" class="room-grid"></section>
@@ -170,8 +176,10 @@
         extendable: '',
         area: '',
         category: '',
-        date:''
-    };
+        startDate: '',
+        endDate: ''
+      };
+
 
       // Images for room types
       const capacityImages = {
@@ -251,6 +259,7 @@
         const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
         
         // Handle possible missing data gracefully
+        
         const area = hotel?.hotel_city && hotel?.hotel_streetname
           ? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`
           : '';
@@ -268,10 +277,11 @@
         } else if (room.mountainview === true) {
           viewType = 'mountain';
         }
-        
+        console.log("Card area set to:", card.dataset.area);
+
         // Set all data attributes for filtering – ENSURE CONSISTENCY 
         card.dataset.capacity = room.capacity || '';
-        card.dataset.chain = (hotel?.chainname || 'Unknown').trim();
+        card.dataset.chain = (room?.chainname || 'Unknown').trim();
         card.dataset.view = viewType;
         card.dataset.extendable = room.extendable ? 'yes' : 'no';
         card.dataset.area = area;
@@ -288,7 +298,7 @@
         // Create card content
         card.innerHTML = `
           <img src="${imgSrc}" alt="${room.capacity} Room" class="room-image" />
-          <h2>${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
+          <h2>${room?.chainname || 'No Chain'} - ${room.capacity}</h2>
           <p>
             Capacity: ${room.capacity}<br/>
             Price: $${Number(room.price || 0).toFixed(2)}<br/>
@@ -335,6 +345,7 @@
           if (filters.chain && filters.chain !== '') {
             const cardChain = card.dataset.chain.toLowerCase().trim();
             const filterChain = filters.chain.toLowerCase().trim();
+            console.log(`[CHAIN] filter: "${filters.chain}", card: "${card.dataset.chain}"`);
             matches = matches && (cardChain === filterChain);
           }
           if (filters.extendable && filters.extendable !== '') {
@@ -343,6 +354,8 @@
           if (filters.area && filters.area !== '') {
             const cardArea = card.dataset.area.toLowerCase().trim();
             const filterArea = filters.area.toLowerCase().trim();
+            console.log(`[AREA] filter: "${filters.area}", card: "${card.dataset.area}"`);
+
             matches = matches && (cardArea === filterArea);
           }
           if (filters.category && filters.category !== '') {
@@ -414,6 +427,9 @@
           });
           console.log("Available chains:", [...uniqueChains]);
           console.log("Available areas:", [...uniqueAreas]);
+          
+
+
           const roomBookings = {};
           bookings.forEach(booking => {
             if (booking.bookingstatus === 'Confirmed') {
@@ -491,15 +507,8 @@
         });
         
         // Add a reset filters button
-        const filterGroup = document.querySelector('.filter-group');
-        const resetButton = document.createElement('button');
         resetButton.textContent = 'Reset Filters';
-        resetButton.style.padding = '10px';
-        resetButton.style.cursor = 'pointer';
-        resetButton.style.backgroundColor = '#f44336';
-        resetButton.style.color = 'white';
-        resetButton.style.border = 'none';
-        resetButton.style.borderRadius = '6px';
+        
         
         resetButton.addEventListener('click', () => {
           document.querySelectorAll('.filter-group select').forEach(select => {
@@ -513,8 +522,6 @@
           });
           applyFilters();
         });
-        
-        filterGroup.appendChild(resetButton);
       };
 
       // Initialize filters and fetch rooms
