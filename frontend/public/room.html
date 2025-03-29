@@ -190,7 +190,15 @@
       };
 
       // Make bookRoom function globally available
+      // Update the bookRoom function to ensure all parameters are properly logged and sent
       window.bookRoom = async (roomID, roomNumber) => {
+        // First, validate parameters
+        if (roomID === undefined || roomNumber === undefined) {
+          alert('Missing room information. Please try another room.');
+          console.error("Missing parameters:", { roomID, roomNumber });
+          return;
+        }
+        
         // Get dates from the date inputs or use defaults
         const startDate = document.getElementById('startDateFilter').value || new Date().toISOString().split("T")[0];
         let endDate = document.getElementById('endDateFilter').value;
@@ -202,26 +210,22 @@
         // For demo purposes, using a fixed customer ID
         const customerID = 101;
 
-        console.log("Booking room:", {
+        const bookingData = { 
           customerID, 
           roomID, 
           roomNumber, 
           startdate: startDate, 
-          enddate: endDate
-        });
+          enddate: endDate,
+          bookingstatus: "Confirmed"
+        };
+
+        console.log("Booking room with data:", bookingData);
 
         try {
           const res = await fetch("http://localhost:5001/book-room", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-              customerID, 
-              roomID, 
-              roomNumber, 
-              startdate: startDate, 
-              enddate: endDate,
-              bookingstatus: "Confirmed"
-            })
+            body: JSON.stringify(bookingData)
           });
 
           if (!res.ok) {
@@ -291,9 +295,17 @@
         card.dataset.startDate = nextAvailableDate.toISOString().split('T')[0];
         card.dataset.endDate = '2025-12-31'; // Far future end date
         
-        // Use consistent casing for room properties
-        const roomId = room.roomid;
-        const roomNumberVal = room.roomnumber;
+          // Add console log to debug room object
+        console.log("Room data:", room);
+        
+        // Ensure consistent property access - try both camelCase and lowercase
+        const roomId = room.roomid || room.roomID;
+        // Try to access roomNumber in multiple ways to ensure we get a value
+        const roomNumberVal = room.roomNumber || room.roomnumber || room["roomNumber"];
+        
+        // Log the extracted values
+        console.log(`Creating card with roomId: ${roomId}, roomNumber: ${roomNumberVal}`);
+        
 
         // Create card content
         card.innerHTML = `
@@ -311,7 +323,7 @@
             <strong>Extendable:</strong> ${card.dataset.extendable === 'yes' ? 'Yes' : 'No'}
           </p>
           <div style="text-align: right; padding: 0 16px 16px;">
-            <button onclick="bookRoom(${roomId}, ${roomNumberVal})">Book</button>
+            <button onclick="console.log('Booking room with ID: ' + ${roomId} + ', Number: ' + ${roomNumberVal}); bookRoom(${roomId}, ${roomNumberVal})">Book</button>
           </div>
         `;
         

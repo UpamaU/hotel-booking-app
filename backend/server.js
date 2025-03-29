@@ -861,52 +861,155 @@ app.post("/customer-login", (req, res) => {
 //-------------------booking--------------------//
 app.post("/book-room", async (req, res) => {
   try {
+    // Log the raw request body first
+    console.log("Raw booking request received:", JSON.stringify(req.body));
+    
     const { customerID, roomID, roomNumber, startdate, enddate, bookingstatus } = req.body;
     
-    // Validate fields
-    if (!customerID || !roomID || !roomNumber || !startdate || !enddate) {
-      return res.status(400).json({ error: "Missing required fields" });
+    // Log all received values explicitly
+    console.log("Received values:", {
+      customerID: customerID,
+      roomID: roomID,
+      roomNumber: roomNumber,
+      startdate: startdate,
+      enddate: enddate,
+      bookingstatus: bookingstatus
+    });
+    
+    // Validate fields - strict check for roomNumber
+    if (!customerID || !roomID || roomNumber === undefined || roomNumber === null || !startdate || !enddate) {
+      console.log("Missing required fields:", { customerID, roomID, roomNumber, startdate, enddate });
+      return res.status(400).json({ error: "Missing required fields", details: { customerID, roomID, roomNumber, startdate, enddate } });
     }
     
-    // Make sure end date is after start date
-    if (new Date(enddate) <= new Date(startdate)) {
-      return res.status(400).json({ error: "End date must be after start date" });
+    // Ensure numeric fields are parsed as numbers
+    const parsedCustomerID = parseInt(customerID, 10);
+    const parsedRoomID = parseInt(roomID, 10);
+    const parsedRoomNumber = parseInt(roomNumber, 10);
+    
+    // Double-check the parsed values
+    console.log("Parsed values:", {
+      parsedCustomerID,
+      parsedRoomID,
+      parsedRoomNumber
+    });
+    
+    // Validate parsed values
+    if (isNaN(parsedCustomerID) || isNaN(parsedRoomID) || isNaN(parsedRoomNumber)) {
+      return res.status(400).json({ 
+        error: "Invalid numeric values", 
+        details: {
+          customerID: `${customerID} (${isNaN(parsedCustomerID) ? "Invalid" : "Valid"})`,
+          roomID: `${roomID} (${isNaN(parsedRoomID) ? "Invalid" : "Valid"})`,
+          roomNumber: `${roomNumber} (${isNaN(parsedRoomNumber) ? "Invalid" : "Valid"})`
+        }
+      });
+    }
+
+    // Log the data types
+    console.log("Data types:", {
+      customerID: typeof customerID, 
+      roomID: typeof roomID,
+      roomNumber: typeof roomNumber,
+      startdate: typeof startdate,
+      enddate: typeof enddate,
+      bookingstatus: typeof bookingstatus
+    });
+    
+    // Check if the dates are valid
+    const startDate = new Date(startdate);
+    const endDate = new Date(enddate);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ error: "Invalid date format" });
     }
     
-    // Check if room is available for the selected dates
-    const availabilityResult = await pool.query(
-      `SELECT bookingid FROM booking
-       WHERE "roomID" = $1 AND "roomNumber" = $2
-       AND bookingstatus = 'Confirmed'
-       AND NOT (enddate < $3 OR startdate > $4)`,
-      [roomID, roomNumber, startdate, enddate]
-    );
-    
-    if (availabilityResult.rows.length > 0) {
-      return res.status(400).json({ error: "Room is not available for the selected dates" });
+    // Ensure status is valid
+    const status = bookingstatus || "Confirmed";
+    if (status !== "Confirmed" && status !== "Cancelled") {
+      return res.status(400).json({ error: "Invalid booking status" });
     }
+
+        // Check if room exists first
+        const roomCheckResult = await pool.query(
+          `SELECT roomid, "roomNumber" FROM room WHERE roomid = $1 AND "roomNumber" = $2`,
+          [parsedRoomID, parsedRoomNumber]
+        );
+        
+        console.log("Room check result:", roomCheckResult.rows);
+        
+        if (roomCheckResult.rows.length === 0) {
+          return res.status(400).json({ 
+            error: "Room does not exist with the provided ID and room number",
+            details: { roomID: parsedRoomID, roomNumber: parsedRoomNumber }
+          });
+        }
+        
     
-    // Insert the booking into the database
+      // Check if room is available for the selected dates
+      const availabilityResult = await pool.query(
+        `SELECT bookingid FROM booking
+        WHERE "roomID" = $1 AND "roomNumber" = $2
+        AND bookingstatus = 'Confirmed'
+        AND NOT (enddate < $3 OR startdate > $4)`,
+        [parsedRoomID, parsedRoomNumber, startdate, enddate]
+      );
+      
+      if (availabilityResult.rows.length > 0) {
+        return res.status(400).json({ error: "Room is not available for the selected dates" });
+      }
+  
+    
+    // Try to insert the booking
+    console.log("Inserting booking with values:", {
+      parsedCustomerID,
+      parsedRoomID,
+      parsedRoomNumber,
+      startdate,
+      enddate,
+      status
+    });
+    
     const result = await pool.query(
       `INSERT INTO booking ("customerID", "roomID", "roomNumber", startdate, enddate, bookingstatus)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING bookingid`,
-      [customerID, roomID, roomNumber, startdate, enddate, bookingstatus || "Confirmed"]
+      [parsedCustomerID, parsedRoomID, parsedRoomNumber, startdate, enddate, status]
     );
     
-    // Log successful booking
-    console.log(`New booking created: ID ${result.rows[0].bookingid} for room ${roomID}-${roomNumber}`);
+    console.log("Booking successful:", result.rows[0]);
     
-    res.json({ 
-      bookingID: result.rows[0].bookingid, 
-      message: "Booking successful" 
-    });
+    // Update the room's is_booked status
+    await pool.query(
+      `UPDATE room SET is_booked = true WHERE roomid = $1 AND "roomNumber" = $2`,
+      [parsedRoomID, parsedRoomNumber]
+    );
     
+    res.json({ bookingID: result.rows[0].bookingid, message: "Booking successful" })
+  
   } catch (error) {
-    console.error("Booking error:", error);
-    res.status(500).json({ error: `Database error: ${error.message}` });
+    console.error("Booking error details:", error);
+
+if (error.code === '23503') {
+      res.status(400).json({ 
+        error: "Foreign key violation: Customer, room, or hotel doesn't exist",
+        details: error.detail || "No additional details available"
+      });
+    } else if (error.code === '23514') {
+      res.status(400).json({ error: "Check constraint violation: Either end date must be after start date or status is invalid" });
+    } else if (error.code === '23502') {  // Not-null constraint violation
+      res.status(400).json({ 
+        error: "Not-null constraint violation", 
+        details: error.detail || "A required field is missing",
+        column: error.column
+      });
+    } else {
+      res.status(500).json({ 
+        error: `Database error: ${error.message}`, 
+        code: error.code,
+        detail: error.detail || "No additional details available"
+      });
+    }
   }
 });
-
 
 // Start the server
 const PORT = process.env.PORT || 5001;
