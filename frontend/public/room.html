@@ -6,25 +6,6 @@
   <title>Rooms | E-Hotel</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-
-
-    .filter-group {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 30px;
-    }
-    .filter-group select, .filter-group input {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    .room-card {
-      display: none;
-    }
-  </style>
 </head>
 <body>
 
@@ -512,6 +493,7 @@
         });
         
         // Initialize date pickers
+
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('startDateFilter').min = today;
         document.getElementById('startDateFilter').addEventListener('change', e => {

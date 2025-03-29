@@ -934,3 +934,19 @@ h3 {
   cursor: pointer;
   min-width: 160px;
 }
+
+.filter-group {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+.filter-group select, .filter-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+.room-card {
+  display: none;
+}
