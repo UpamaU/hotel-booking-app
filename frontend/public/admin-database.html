@@ -188,6 +188,81 @@
                 </div>
             </form>
         </div>
+
+        <!-- Hotel section -->
+        <div class="section">
+            <h2>Manage Hotels</h2>
+            <div class="search-container">
+            <input type="text" id="hotelSearch" placeholder="Search Hotel">
+            <button onclick="searchHotels()">Search</button>
+            </div>
+            <div id="hotelSearchResults" class="search-results"></div>
+            <form id="hotelForm">
+            <h3>Add / Update Hotel</h3>
+            <input type="hidden" id="hotelID">
+            <input type="text" id="chainName" placeholder="Chain Name" required>
+            <input type="number" id="numberOfRooms" placeholder="Number of Rooms" required>
+            <input type="text" id="hotelStreetNumber" placeholder="Street Number">
+            <input type="text" id="hotelStreetName" placeholder="Street Name">
+            <input type="text" id="hotelCity" placeholder="City">
+            <input type="text" id="hotelZipCode" placeholder="Zip Code">
+            <input type="text" id="hotelCountry" placeholder="Country">
+            <input type="number" id="managerID" placeholder="Manager ID">
+            <input type="number" id="category" placeholder="Category (1-5)" min="1" max="5">
+            <input type="text" id="hotelPhone" placeholder="Phone Number">
+            <input type="email" id="hotelEmail" placeholder="Email Address">
+            <div class="form-actions">
+                <button type="button" onclick="addHotel()">Add Hotel</button>
+                <button type="button" onclick="updateHotel()">Update Hotel</button>
+                <button type="button" onclick="deleteHotel()">Delete Hotel</button>
+            </div>
+            </form>
+        </div>
+
+
+        <!-- Room section -->
+        <div class="section">
+            <h2>Manage Rooms</h2>
+            <div class="search-container">
+                <input type="text" id="roomSearch" placeholder="Search Room">
+                <button onclick="searchRooms()">Search</button>
+            </div>
+            <div id="roomSearchResults" class="search-results"></div>
+            <form id="roomForm">
+                <h3>Add / Update Room</h3>
+                <input type="hidden" id="roomID">
+                <input type="number" id="roomNumber" placeholder="Room Number" required>
+                <input type="number" id="price" placeholder="Price ($)">
+                <input type="text" id="capacity" placeholder="Capacity">
+                <input type="text" id="viewType" placeholder="View Type">
+                <select id="extendableSelect">
+                    <option value="false">Not Extendable</option>
+                    <option value="true">Extendable</option>
+                </select>
+                <input type="text" id="amenities" placeholder="Amenities">
+                <input type="text" id="probStatus" placeholder="Problem Status (leave empty or type 'repairing')">
+                <input type="number" id="roomHotelID" placeholder="Hotel ID" required>
+                <select id="seaViewSelect">
+                    <option value="false">No Sea View</option>
+                    <option value="true">Sea View</option>
+                </select>
+                <select id="mountainViewSelect">
+                    <option value="false">No Mountain View</option>
+                    <option value="true">Mountain View</option>
+                </select>
+                <input type="text" id="damages" placeholder="Damages">
+                <select id="isBookedSelect">
+                    <option value="false">Available</option>
+                    <option value="true">Booked</option>
+                </select>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="addRoom()">Add Room</button>
+                    <button type="button" onclick="updateRoom()">Update Room</button>
+                    <button type="button" onclick="deleteRoom()">Delete Room</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -231,8 +306,8 @@
                     <td>${customer.customerID}</td>
                     <td>${customer.customer_firstName}</td>
                     <td>${customer.customer_lastName}</td>
-                    <td>${customer.customer_city}</td>
-                    <td>${customer.customer_country}</td>
+                    <td>${customer.customer_city || ''}</td>
+                    <td>${customer.customer_country || ''}</td>
                 `;
                 row.onclick = () => populateCustomerForm(customer);
             });
@@ -426,7 +501,7 @@
                     <td>${employee.ssn_sin}</td>
                     <td>${employee.employee_firstname}</td>
                     <td>${employee.employee_lastname}</td>
-                    <td>${employee.employee_city}</td>
+                    <td>${employee.employee_city || ''}</td>
                 `;
                 row.onclick = () => populateEmployeeForm(employee);
             });
@@ -443,9 +518,10 @@
             document.getElementById('employeeLastName').value = employee.employee_lastname;
             document.getElementById('employeeStreetNumber').value = employee.employee_streetnumber || '';
             document.getElementById('employeeStreetName').value = employee.employee_streetname || '';
-            document.getElementById('employeeCity').value = employee.employee_city;
+            document.getElementById('employeeCity').value = employee.employee_city || '';
             document.getElementById('employeeZipCode').value = employee.employee_zipcode || '';
-            document.getElementById('employeeCountry').value = employee.employee_country;
+            document.getElementById('employeeCountry').value = employee.employee_country || '';
+            document.getElementById('employeeRole').value = employee.role || '';
         }
 
         // add employee function
@@ -576,6 +652,428 @@
         function resetEmployeeForm() {
             document.getElementById('employeeForm').reset();
             document.getElementById('employeeID').value = '';
+        }
+
+        // Hotel search function
+        async function searchHotels() {
+            const searchTerm = document.getElementById('hotelSearch').value;
+            try {
+                const response = await fetch(`http://localhost:5001/hotel?search=${searchTerm}`);
+                const hotels = await response.json();
+                displayHotelResults(hotels);
+            } catch (error) {
+                console.error('Error searching hotels:', error);
+                alert('Error searching hotels');
+            }
+        }
+
+        // display hotel search results
+        function displayHotelResults(hotels) {
+            const resultsDiv = document.getElementById('hotelSearchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (hotels.length === 0) {
+                resultsDiv.innerHTML = '<p>No hotels found</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>Chain Name</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>Category</th>
+                </tr>
+            `;
+
+            hotels.forEach(hotel => {
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${hotel.hotelid}</td>
+                    <td>${hotel.chain_name || ''}</td>
+                    <td>${hotel.hotel_city || ''}</td>
+                    <td>${hotel.hotel_country || ''}</td>
+                    <td>${hotel.category || ''}</td>
+                `;
+                row.onclick = () => populateHotelForm(hotel);
+            });
+
+            resultsDiv.appendChild(table);
+        }
+
+        // populate hotel form with selected hotel data
+        function populateHotelForm(hotel) {
+            document.getElementById('hotelID').value = hotel.hotelid;
+            document.getElementById('chainName').value = hotel.chain_name || '';
+            document.getElementById('numberOfRooms').value = hotel.number_of_rooms || '';
+            document.getElementById('hotelStreetNumber').value = hotel.hotel_street_number || '';
+            document.getElementById('hotelStreetName').value = hotel.hotel_street_name || '';
+            document.getElementById('hotelCity').value = hotel.hotel_city || '';
+            document.getElementById('hotelZipCode').value = hotel.hotel_zipcode || '';
+            document.getElementById('hotelCountry').value = hotel.hotel_country || '';
+            document.getElementById('managerID').value = hotel.manager_id || '';
+            document.getElementById('category').value = hotel.category || '';
+            document.getElementById('hotelPhone').value = hotel.hotel_phone || '';
+            document.getElementById('hotelEmail').value = hotel.hotel_email || '';
+        }
+
+        // add hotel function
+        async function addHotel() {
+            // validate required fields
+            const chainName = document.getElementById('chainName').value.trim();
+            const numberOfRooms = document.getElementById('numberOfRooms').value.trim();
+            const managerID = document.getElementById('managerID').value.trim(); 
+            
+            if (!chainName || !numberOfRooms || !managerID) {
+                alert('Please fill in all required fields (Chain Name, Number of Rooms, Manager ID)');
+                return;
+            }
+
+            const newHotel = {
+                chain_name: chainName,
+                number_of_rooms: numberOfRooms,
+                hotel_street_number: document.getElementById('hotelStreetNumber').value || null,
+                hotel_street_name: document.getElementById('hotelStreetName').value || null,
+                hotel_city: document.getElementById('hotelCity').value || null,
+                hotel_zipcode: document.getElementById('hotelZipCode').value || null,
+                hotel_country: document.getElementById('hotelCountry').value || null,
+                manager_id: managerID,
+                category: document.getElementById('category').value || null,
+                hotel_phone: document.getElementById('hotelPhone').value || null,
+                hotel_email: document.getElementById('hotelEmail').value || null
+            };
+
+            try {
+                const response = await fetch('http://localhost:5001/hotel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newHotel)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Hotel added successfully with ID: ${result.hotelid}`);
+                    resetHotelForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to add hotel: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error adding hotel:', error);
+                alert('Error adding hotel');
+            }
+        }
+
+        // update hotel function
+        async function updateHotel() {
+            const hotelID = document.getElementById('hotelID').value;
+            if (!hotelID) {
+                alert('Please search and select a hotel to update');
+                return;
+            }
+
+            const updatedHotel = {
+                chain_name: document.getElementById('chainName').value,
+                number_of_rooms: document.getElementById('numberOfRooms').value,
+                hotel_street_number: document.getElementById('hotelStreetNumber').value || null,
+                hotel_street_name: document.getElementById('hotelStreetName').value || null,
+                hotel_city: document.getElementById('hotelCity').value || null,
+                hotel_zipcode: document.getElementById('hotelZipCode').value || null,
+                hotel_country: document.getElementById('hotelCountry').value || null,
+                manager_id: document.getElementById('managerID').value,
+                category: document.getElementById('category').value || null,
+                hotel_phone: document.getElementById('hotelPhone').value || null,
+                hotel_email: document.getElementById('hotelEmail').value || null
+            };
+
+            try {
+                const response = await fetch(`http://localhost:5001/hotel/${hotelID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedHotel)
+                });
+
+                if (response.ok) {
+                    alert('Hotel updated successfully');
+                    resetHotelForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to update hotel: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error updating hotel:', error);
+                alert('Error updating hotel');
+            }
+        }
+
+        // delete hotel function
+        async function deleteHotel() {
+            const hotelID = document.getElementById('hotelID').value;
+            if (!hotelID) {
+                alert('Please search and select a hotel to delete');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this hotel? This action cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5001/hotel/${hotelID}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Hotel deleted successfully');
+                    resetHotelForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to delete hotel: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error deleting hotel:', error);
+                alert('Error deleting hotel');
+            }
+        }
+
+        // reset hotel form
+        function resetHotelForm() {
+            document.getElementById('hotelForm').reset();
+            document.getElementById('hotelID').value = '';
+        }
+        
+        
+        // Room search function
+        async function searchRooms() {
+            const searchTerm = document.getElementById('roomSearch').value;
+            try {
+                const response = await fetch(`http://localhost:5001/room?search=${searchTerm}`);
+                const rooms = await response.json();
+                displayRoomResults(rooms);
+            } catch (error) {
+                console.error('Error searching rooms:', error);
+                alert('Error searching rooms');
+            }
+        }
+
+        // display room search results
+        function displayRoomResults(rooms) {
+            const resultsDiv = document.getElementById('roomSearchResults');
+            resultsDiv.innerHTML = '';
+            
+            if (rooms.length === 0) {
+                resultsDiv.innerHTML = '<p>No rooms found</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'results-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Room Number</th>
+                        <th>Hotel</th>
+                        <th>Price</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            
+            const tbody = table.querySelector('tbody');
+
+            rooms.forEach(room => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${room.roomid}</td>
+                    <td>${room.roomNumber || ''}</td>
+                    <td>${room.chainname || ''} (${room.hotel_city || ''})</td>
+                    <td>$${room.price || '0'}</td>
+                    <td>${room.capacity || ''}</td>
+                    <td>${room.is_booked ? 'Booked' : 'Available'}</td>
+                `;
+                row.className = 'clickable-row';
+                row.onclick = () => populateRoomForm(room);
+            });
+
+            resultsDiv.appendChild(table);
+        }
+
+        // populate room form with selected room data
+        function populateRoomForm(room) {
+            document.getElementById('roomID').value = room.roomid;
+            document.getElementById('roomNumber').value = room.roomNumber || '';
+            document.getElementById('price').value = room.price || '';
+            document.getElementById('capacity').value = room.capacity || '';
+            document.getElementById('viewType').value = room.viewType || '';
+            document.getElementById('extendableSelect').value = room.extendable ? 'true' : 'false';
+            document.getElementById('amenities').value = room.amenities || '';
+            document.getElementById('probStatus').value = room.probStatus || '';
+            document.getElementById('roomHotelID').value = room.hotelid || '';
+            document.getElementById('seaViewSelect').value = room.seaview ? 'true' : 'false';
+            document.getElementById('mountainViewSelect').value = room.mountainview ? 'true' : 'false';
+            document.getElementById('damages').value = room.damages || '';
+            document.getElementById('isBookedSelect').value = room.is_booked ? 'true' : 'false';
+        }
+
+        // add room function
+        async function addRoom() {
+            // validate required fields
+            const roomNumber = document.getElementById('roomNumber').value.trim();
+            const hotelID = document.getElementById('roomHotelID').value.trim();
+            
+            if (!roomNumber || !hotelID) {
+                alert('Please fill in all required fields (Room Number, Hotel ID)');
+                return;
+            }
+
+            // format amenities as a postgresql array string, need this so rooms can be added witjout error
+            let amenitiesValue = document.getElementById('amenities').value || null;
+            if (amenitiesValue) {
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
+                amenitiesValue = '{' + amenitiesValue + '}';
+            }
+
+            let probStatusValue = document.getElementById('probStatus').value || null;
+            if (probStatusValue) {
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
+                probStatusValue = '{' + probStatusValue + '}';
+            }
+
+            const newRoom = {
+                roomnumber: roomNumber,
+                price: document.getElementById('price').value || null,
+                capacity: document.getElementById('capacity').value || null,
+                viewtype: document.getElementById('viewType').value || null,
+                extendable: document.getElementById('extendableSelect').value === 'true',
+                amenities: amenitiesValue,
+                probstatus: probStatusValue,
+                hotelid: hotelID,
+                seaview: document.getElementById('seaViewSelect').value === 'true',
+                mountainview: document.getElementById('mountainViewSelect').value === 'true',
+                damages: document.getElementById('damages').value || null,
+                is_booked: document.getElementById('isBookedSelect').value === 'true'
+            };
+
+            try {
+                const response = await fetch('http://localhost:5001/room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newRoom)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Room added successfully with ID: ${result.roomid}`);
+                    resetRoomForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to add room: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error adding room:', error);
+                alert('Error adding room');
+            }
+        }
+
+        // update room function
+        async function updateRoom() {
+            const roomID = document.getElementById('roomID').value;
+            if (!roomID) {
+                alert('Please search and select a room to update');
+                return;
+            }
+
+            // format amenities as a postgresql array string, need this so rooms can be added witjout error
+            let amenitiesValue = document.getElementById('amenities').value || null;
+            if (amenitiesValue) {
+                // If it's a comma-separated string  like text[],(which it will show up as on the ui) format it as postgresql array
+                amenitiesValue = '{' + amenitiesValue + '}';
+            }
+
+            let probStatusValue = document.getElementById('probStatus').value || null;
+            if (probStatusValue) {
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
+                probStatusValue = '{' + probStatusValue + '}';
+            }
+            
+            const updatedRoom = {
+                roomnumber: document.getElementById('roomNumber').value,
+                price: document.getElementById('price').value || null,
+                capacity: document.getElementById('capacity').value || null,
+                viewtype: document.getElementById('viewType').value || null,
+                extendable: document.getElementById('extendableSelect').value === 'true',
+                amenities: amenitiesValue,
+                probstatus: probStatusValue,
+                hotelid: document.getElementById('roomHotelID').value,
+                seaview: document.getElementById('seaViewSelect').value === 'true',
+                mountainview: document.getElementById('mountainViewSelect').value === 'true',
+                damages: document.getElementById('damages').value || null,
+                is_booked: document.getElementById('isBookedSelect').value === 'true'
+            };
+
+            try {
+                const response = await fetch(`http://localhost:5001/room/${roomID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedRoom)
+                });
+
+                if (response.ok) {
+                    alert('Room updated successfully');
+                    resetRoomForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to update room: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error updating room:', error);
+                alert('Error updating room');
+            }
+        }
+
+        // delete room function
+        async function deleteRoom() {
+            const roomID = document.getElementById('roomID').value;
+            if (!roomID) {
+                alert('Please search and select a room to delete');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5001/room/${roomID}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Room deleted successfully');
+                    resetRoomForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to delete room: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error deleting room:', error);
+                alert('Error deleting room');
+            }
+        }
+
+        // reset room form
+        function resetRoomForm() {
+            document.getElementById('roomForm').reset();
+            document.getElementById('roomID').value = '';
         }
     </script>
 </body>

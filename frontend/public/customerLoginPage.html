@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - E-Hotel</title>
+  <title>Customer Login - E-Hotel</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -17,32 +17,61 @@
       <a href="room.html">Rooms</a>
       <a href="about.html">About Us</a>
       <a href="profile.html">Profile</a>
-      <a href="login.htm"><button class="login-button">Login</button></a>
-      <a href="hotel-statistics.html" > Hotel Statistics</a>
+      <a href="login.html"><button class="login-button">Login</button></a>
+      <a href="hotel-statistics.html">Hotel Statistics</a>
     </div>
   </nav>
 
-
-  <!-- Username and Password boxes -->
-   
+  <!-- Login Section -->
   <section class="logins_section">
     <div class="logins_grid">
-
-      <h1 class = "logins_header">Customer Login Page</h1>
+      <h1 class="logins_header">Customer Login Page</h1>
     </div>
 
     <div class="logins_grid">
-      <!-- Customer -->
-      <div class="room-card" class = "logins_form_box">
-        <form action="profile.html" class = "logins_form">
-          <label for="fname" class = "logins_subheader">Username:</label>
-          <input type="text" id="username" name="username" class = "logins_textbox"><br><br>
-          <label for="lname" class = "logins_subheader">Password:</label>
-          <input type="text" id="password" name="password" class = "logins_textbox"><br><br>
-          <input type="submit" value="Submit" class = "btn" style = "margin: auto;">
+      <div class="room-card logins_form_box">
+        <form id="customerLoginForm" class="logins_form">
+          <label for="username1" class="logins_subheader">Username:</label>
+          <input type="text" id="username1" name="username1" required class="logins_subheader"><br>
+
+          <label for="password1" class="logins_subheader">Password:</label>
+          <input type="password" id="password1" name="password1" required class="logins_subheader"><br>
+
+          <button type="submit" class="btn" style="margin: auto;">Login</button>
         </form>
       </div>
     </div>
+
+    <!-- Script to Handle Customer Login -->
+    <script>
+      document.getElementById('customerLoginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username1 = document.getElementById('username1').value;
+        const password1 = document.getElementById('password1').value;
+
+        try {
+          const response = await fetch('http://localhost:5001/customer-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username1, password1 }) 
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+            window.location.href = 'profile.html';  // Redirect on successful login
+          } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error}`);
+          }
+        } catch (error) {
+          console.error('Login failed:', error);
+          alert('An error occurred during login');
+        }
+      });
+    </script>
+
   </section>
 
 </body>

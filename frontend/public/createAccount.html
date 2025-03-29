@@ -23,24 +23,57 @@
   </nav>
 
 
-  <!-- Username and Password boxes -->
-  <section class="logins_section">
+   <!-- Username and Password boxes -->
+   <section class="logins_section">
     <div class="logins_grid">
+
       <h1 class = "logins_header">Create an Account</h1>
     </div>
 
     <div class="logins_grid">
-      <!-- Customer -->
-      <div class="room-card" class = "logins_form_box">
-        <form action="profile.html" class = "logins_form">
-          <label for="fname" class = "logins_subheader">Username:</label>
-          <input type="text" id="username" name="username" class = "logins_textbox"><br><br>
-          <label for="lname" class = "logins_subheader">Password:</label>
-          <input type="text" id="password" name="password" class = "logins_textbox"><br><br>
-          <input type="submit" value="Submit" class = "btn" style = "margin: auto;">
+      <div class="room-card logins_form_box">
+
+        <form id="loginForm" class="logins_form">
+          <label for="username" class = "logins_subheader">Username:</label>
+          <input type="text" id="username" name="username" required class = "logins_subheader"><br>
+          
+          <label for="password" class = "logins_subheader">Password:</label>
+          <input type="password" id="password" name="password" required class = "logins_subheader"><br>
+          
+          <button type="submit" class = "btn" style = "margin: auto;">Create Account</button>
         </form>
       </div>
     </div>
+
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const response = await fetch('http://localhost:5001/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+            window.location.href = 'profile.html';  // Redirect on successful login
+          } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error}`);
+          }
+        } catch (error) {
+          console.error('Login failed:', error);
+          alert('An error occurred during login');
+        }
+      });
+    </script>
+
   </section>
 
 </body>
