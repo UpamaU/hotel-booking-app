@@ -104,152 +104,372 @@
 </main>
 
 <script>
-  // Update filters object to include both start and end dates.
-  const filters = {
-    capacity: '',
-    view: '',
-    chain: '',
-    extendable: '',
-    area: '',
-    category: '',
-    startDate: '',
-    endDate: ''
-  };
+  document.addEventListener('DOMContentLoaded', () => {
+      const roomGrid = document.getElementById('roomGrid');
+      let hotelsById = {};
+      
+      // Filter object to track all active filters
+      const filters = {
+        capacity: '',
+        view: '',
+        chain: '',
+        extendable: '',
+        area: '',
+        category: '',
+        startDate: '',
+        endDate: ''
+      };
 
-  const capacityImages = {
-    Single: 'images/Single.jpeg',
-    Double: 'images/Double.jpeg',
-    Family: 'images/Family.jpeg',
-    Suite: 'images/Suite.jpeg'
-  };
+      // Images for room types
+      const capacityImages = {
+        Single: 'images/Single.jpeg',
+        Double: 'images/Double.jpeg',
+        Family: 'images/Family.jpeg',
+        Suite: 'images/Suite.jpeg'
+      };
 
-  const roomGrid = document.getElementById('roomGrid');
-  let hotelsById = {};
+      // Make bookRoom function globally available
+      window.bookRoom = async (roomID, roomNumber) => {
+        // Get dates from the date inputs or use defaults
+        const startDate = document.getElementById('startDateFilter').value || new Date().toISOString().split("T")[0];
+        let endDate = document.getElementById('endDateFilter').value;
+        if (!endDate) {
+          const defaultEnd = new Date(new Date(startDate).getTime() + 86400000); // +1 day
+          endDate = defaultEnd.toISOString().split("T")[0];
+        }
+        
+        // For demo purposes, using a fixed customer ID
+        const customerID = 101;
 
-  // Updated applyFilters to include startDate and endDate
-  const applyFilters = () => {
-  const roomCards = document.querySelectorAll('.room-card');
-  const isAnyFilterActive = Object.values(filters).some(val => val !== '');
+        console.log("Booking room:", {
+          customerID, 
+          roomID, 
+          roomNumber, 
+          startdate: startDate, 
+          enddate: endDate
+        });
 
-  roomCards.forEach(card => {
-    const matches = 
-      (!filters.capacity || card.dataset.capacity === filters.capacity) &&
-      (!filters.view || card.dataset.view === filters.view) &&
-      (!filters.chain || card.dataset.chain.toLowerCase().trim() === filters.chain.toLowerCase().trim()) &&
-      (!filters.extendable || card.dataset.extendable === filters.extendable) &&
-      (!filters.area || card.dataset.area.toLowerCase().trim() === filters.area.toLowerCase().trim()) &&
-      (!filters.category || card.dataset.category === filters.category);
-      // The startDate and endDate conditions have been removed.
+        try {
+          const res = await fetch("http://localhost:5001/book-room", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              customerID, 
+              roomID, 
+              roomNumber, 
+              startdate: startDate, 
+              enddate: endDate,
+              bookingstatus: "Confirmed"
+            })
+          });
 
-    card.style.display = (isAnyFilterActive && matches) ? 'block' : 'none';
-  });
-};
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "Unknown booking error");
+          }
+          
+          const data = await res.json();
+          alert(`Booking successful! Booking ID: ${data.bookingID}`);
+          // Refresh the room list to update availability
+          fetchHotelsAndRooms();
+        } catch (error) {
+          console.error("Booking error:", error);
+          alert(`Booking failed: ${error.message}`);
+        }
+      };
 
+      // Helper function to format dates
+      const formatDate = (dateStr) => {
+        try {
+          const date = new Date(dateStr);
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+        } catch (e) {
+          console.error("Date formatting error:", e);
+          return dateStr; // Return original if error
+        }
+      };
 
-  const fetchHotelsAndRooms = async () => {
-    try {
-      const [hotelRes, roomRes, bookingRes] = await Promise.all([
-        fetch('http://localhost:5001/hotel'),
-        fetch('http://localhost:5001/room'),
-        fetch('http://localhost:5001/booking')
-      ]);
-
-      const [hotels, rooms, bookings] = await Promise.all([
-        hotelRes.json(),
-        roomRes.json(),
-        bookingRes.json()
-      ]);
-
-      hotels.forEach(hotel => {
-        hotelsById[hotel.hotelid] = hotel;
-      });
-
-      roomGrid.innerHTML = '';
-
-      rooms.forEach(room => {
+      // Function to create room cards with consistent data attributes
+      const createRoomCard = (room, hotel, nextAvailableDate) => {
         const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
-        const hotel = hotelsById[room.hotelid];
+        
+        // Handle possible missing data gracefully
         const area = hotel?.hotel_city && hotel?.hotel_streetname
           ? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`
           : '';
 
+        // Create the room card
         const card = document.createElement('div');
         card.className = 'room-card';
-        card.dataset.capacity = room.capacity;
-        card.dataset.chain = hotel?.chainname?.trim() || 'Unknown';
-        card.dataset.view = room.seaview && room.mountainview
-          ? 'both'
-          : room.seaview
-          ? 'sea'
-          : room.mountainview
-          ? 'mountain'
-          : 'none';
+        
+        // Determine view type based on room properties
+        let viewType = 'none';
+        if (room.seaview === true && room.mountainview === true) {
+          viewType = 'both';
+        } else if (room.seaview === true) {
+          viewType = 'sea';
+        } else if (room.mountainview === true) {
+          viewType = 'mountain';
+        }
+        
+        // Set all data attributes for filtering – ENSURE CONSISTENCY 
+        card.dataset.capacity = room.capacity || '';
+        card.dataset.chain = (hotel?.chainname || 'Unknown').trim();
+        card.dataset.view = viewType;
         card.dataset.extendable = room.extendable ? 'yes' : 'no';
         card.dataset.area = area;
         card.dataset.category = hotel?.category?.toString() || '';
+        
+        // Set availability dates
+        card.dataset.startDate = nextAvailableDate.toISOString().split('T')[0];
+        card.dataset.endDate = '2025-12-31'; // Far future end date
+        
+        // Use consistent casing for room properties
+        const roomId = room.roomid;
+        const roomNumberVal = room.roomnumber;
 
-        // Here we assign placeholder available dates. Replace these with actual data if available.
-        card.dataset.startDate = '2025-04-01';
-        card.dataset.endDate = '2025-04-05';
-
+        // Create card content
         card.innerHTML = `
           <img src="${imgSrc}" alt="${room.capacity} Room" class="room-image" />
           <h2>${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
           <p>
             Capacity: ${room.capacity}<br/>
-            Price: $${Number(room.price).toFixed(2)}<br/>
+            Price: $${Number(room.price || 0).toFixed(2)}<br/>
             Category: ${hotel?.category ? '★'.repeat(hotel.category) : 'Unrated'}<br/>
             Location: ${hotel?.hotel_streetnumber || ''} ${hotel?.hotel_streetname || ''}, ${hotel?.hotel_city || ''}, ${hotel?.hotel_country || ''}
           </p>
+          <p>
+            <strong>Available From:</strong> ${formatDate(card.dataset.startDate)}<br/>
+            <strong>View:</strong> ${viewType.charAt(0).toUpperCase() + viewType.slice(1)}<br/>
+            <strong>Extendable:</strong> ${card.dataset.extendable === 'yes' ? 'Yes' : 'No'}
+          </p>
           <div style="text-align: right; padding: 0 16px 16px;">
-            <button onclick="bookRoom(${room.roomid}, ${room.roomnumber})">Book</button>
+            <button onclick="bookRoom(${roomId}, ${roomNumberVal})">Book</button>
           </div>
         `;
-        roomGrid.appendChild(card);
-      });
+        
+        return card;
+      };
 
-      applyFilters();
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+      // Enhanced applyFilters function with robust handling of each filter
+      const applyFilters = () => {
+        const roomCards = document.querySelectorAll('.room-card');
+        const isAnyFilterActive = Object.values(filters).some(val => val !== '');
+        
+        // If no filters active, show all cards
+        if (!isAnyFilterActive) {
+          roomCards.forEach(card => card.style.display = 'block');
+          const noResultsMsg = document.getElementById('noResultsMessage');
+          if (noResultsMsg) noResultsMsg.remove();
+          return;
+        }
+        
+        let matchCount = 0;
+        roomCards.forEach(card => {
+          let matches = true;
+          if (filters.capacity && filters.capacity !== '') {
+            matches = matches && (card.dataset.capacity === filters.capacity);
+          }
+          if (filters.view && filters.view !== '') {
+            const cardView = card.dataset.view.toLowerCase().trim();
+            const filterView = filters.view.toLowerCase().trim();
+            matches = matches && (cardView === filterView);
+          }
+          if (filters.chain && filters.chain !== '') {
+            const cardChain = card.dataset.chain.toLowerCase().trim();
+            const filterChain = filters.chain.toLowerCase().trim();
+            matches = matches && (cardChain === filterChain);
+          }
+          if (filters.extendable && filters.extendable !== '') {
+            matches = matches && (card.dataset.extendable === filters.extendable);
+          }
+          if (filters.area && filters.area !== '') {
+            const cardArea = card.dataset.area.toLowerCase().trim();
+            const filterArea = filters.area.toLowerCase().trim();
+            matches = matches && (cardArea === filterArea);
+          }
+          if (filters.category && filters.category !== '') {
+            matches = matches && (card.dataset.category === filters.category);
+          }
+          // Date filtering – only if both dates are provided
+          if (filters.startDate && filters.endDate) {
+            try {
+              const roomStartDate = new Date(card.dataset.startDate);
+              const roomEndDate = new Date(card.dataset.endDate);
+              const filterStartDate = new Date(filters.startDate);
+              const filterEndDate = new Date(filters.endDate);
+              // Check if the room's availability overlaps the filter range
+              const dateMatches = filterStartDate <= roomEndDate && filterEndDate >= roomStartDate;
+              matches = matches && dateMatches;
+            } catch(e) {
+              console.error("Date error:", e, "on card", card);
+            }
+          }
+          
+          card.style.display = matches ? 'block' : 'none';
+          if (matches) matchCount++;
+        });
+        
+        // Display a no-results message if needed
+        const noResultsMsg = document.getElementById('noResultsMessage');
+        if (matchCount === 0) {
+          if (!noResultsMsg) {
+            const msg = document.createElement('div');
+            msg.id = 'noResultsMessage';
+            msg.textContent = 'No rooms match your criteria. Please try different filters.';
+            msg.style.textAlign = 'center';
+            msg.style.padding = '20px';
+            msg.style.fontWeight = 'bold';
+            roomGrid.appendChild(msg);
+          }
+        } else if (noResultsMsg) {
+          noResultsMsg.remove();
+        }
+        console.log(`Found ${matchCount} matching rooms`);
+      };
 
-  // Book room function with hardcoded customerID and current date values.
-  const bookRoom = async (roomID, roomNumber) => {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    const customerID = "101"; // Hardcoded customer ID
+      // Enhanced fetchHotelsAndRooms function with improved data handling
+      const fetchHotelsAndRooms = async () => {
+        try {
+          roomGrid.innerHTML = '<div style="text-align: center; padding: 20px;">Loading rooms...</div>';
+          const [hotelRes, roomRes, bookingRes] = await Promise.all([
+            fetch('http://localhost:5001/hotel'),
+            fetch('http://localhost:5001/room'),
+            fetch('http://localhost:5001/booking')
+          ]);
+          const [hotels, rooms, bookings] = await Promise.all([
+            hotelRes.json(),
+            roomRes.json(),
+            bookingRes.json()
+          ]);
+          console.log(`Fetched ${hotels.length} hotels, ${rooms.length} rooms, and ${bookings.length} bookings`);
+          hotels.forEach(hotel => {
+            hotelsById[hotel.hotelid] = hotel;
+          });
+          const uniqueChains = new Set();
+          const uniqueAreas = new Set();
+          const uniqueViews = new Set();
+          hotels.forEach(hotel => {
+            if (hotel.chainname) uniqueChains.add(hotel.chainname.trim());
+            if (hotel.hotel_city && hotel.hotel_streetname) {
+              uniqueAreas.add(`${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`);
+            }
+          });
+          console.log("Available chains:", [...uniqueChains]);
+          console.log("Available areas:", [...uniqueAreas]);
+          const roomBookings = {};
+          bookings.forEach(booking => {
+            if (booking.bookingstatus === 'Confirmed') {
+              const key = `${booking.roomID || booking.roomid}-${booking.roomNumber || booking.roomnumber}`;
+              if (!roomBookings[key]) {
+                roomBookings[key] = [];
+              }
+              roomBookings[key].push({
+                startDate: new Date(booking.startdate),
+                endDate: new Date(booking.enddate)
+              });
+            }
+          });
+          roomGrid.innerHTML = '';
+          if (rooms.length === 0) {
+            roomGrid.innerHTML = '<div style="text-align: center; padding: 20px;">No rooms available</div>';
+            return;
+          }
+          rooms.forEach(room => {
+            const hotel = hotelsById[room.hotelid];
+            let nextAvailableDate = new Date();
+            const bookingKey = `${room.roomid}-${room.roomnumber}`;
+            const roomBookingList = roomBookings[bookingKey] || [];
+            if (roomBookingList.length > 0) {
+              roomBookingList.forEach(booking => {
+                if (booking.endDate > nextAvailableDate) {
+                  nextAvailableDate = new Date(booking.endDate);
+                  nextAvailableDate.setDate(nextAvailableDate.getDate() + 1);
+                }
+              });
+            }
+            const viewType = room.seaview && room.mountainview ? 'both' : 
+                              room.seaview ? 'sea' : 
+                              room.mountainview ? 'mountain' : 'none';
+            uniqueViews.add(viewType);
+            const card = createRoomCard(room, hotel, nextAvailableDate);
+            roomGrid.appendChild(card);
+            card.style.display = 'block';
+          });
+          console.log("Available views:", [...uniqueViews]);
+          if (Object.values(filters).some(val => val !== '')) {
+            applyFilters();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          roomGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Error loading rooms. Please try again later.</div>';
+        }
+      };
 
-    try {
-      const res = await fetch("http://localhost:5001/book-room", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerID, roomID, roomNumber, startdate: today, enddate: today })
-      });
+      // Updated filter setup with more robust handling
+      const setupFilters = () => {
+        document.querySelectorAll('.filter-group select, .filter-group input').forEach(filter => {
+          filter.addEventListener('change', e => {
+            const key = e.target.id.replace('Filter', '');
+            const filterKey = key.charAt(0).toLowerCase() + key.slice(1);
+            filters[filterKey] = e.target.value;
+            console.log(`Filter "${filterKey}" changed to "${e.target.value}"`);
+            applyFilters();
+          });
+        });
+        
+        // Initialize date pickers
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDateFilter').min = today;
+        document.getElementById('startDateFilter').addEventListener('change', e => {
+          const startDate = new Date(e.target.value);
+          const minEndDate = new Date(startDate);
+          minEndDate.setDate(minEndDate.getDate() + 1);
+          const endDatePicker = document.getElementById('endDateFilter');
+          endDatePicker.min = minEndDate.toISOString().split('T')[0];
+          if (endDatePicker.value && new Date(endDatePicker.value) <= startDate) {
+            endDatePicker.value = minEndDate.toISOString().split('T')[0];
+            filters.endDate = endDatePicker.value;
+          }
+        });
+        
+        // Add a reset filters button
+        const filterGroup = document.querySelector('.filter-group');
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset Filters';
+        resetButton.style.padding = '10px';
+        resetButton.style.cursor = 'pointer';
+        resetButton.style.backgroundColor = '#f44336';
+        resetButton.style.color = 'white';
+        resetButton.style.border = 'none';
+        resetButton.style.borderRadius = '6px';
+        
+        resetButton.addEventListener('click', () => {
+          document.querySelectorAll('.filter-group select').forEach(select => {
+            select.value = '';
+          });
+          document.querySelectorAll('.filter-group input[type="date"]').forEach(input => {
+            input.value = '';
+          });
+          Object.keys(filters).forEach(key => {
+            filters[key] = '';
+          });
+          applyFilters();
+        });
+        
+        filterGroup.appendChild(resetButton);
+      };
 
-      const data = await res.json();
-      if (res.ok) {
-        alert(`Booking successful! ID: ${data.bookingID}`);
-      } else {
-        alert(`Booking failed: ${data.error}`);
-      }
-    } catch (error) {
-      alert("Booking failed due to a network error.");
-    }
-  };
-
-  // Add event listeners for all filter inputs
-  document.querySelectorAll('.filter-group select, .filter-group input').forEach(filter => {
-    filter.addEventListener('change', e => {
-      // Get the filter key from the element's ID (e.g., "capacityFilter" => "capacity")
-      const key = e.target.id.replace('Filter', '');
-      // Lowercase first letter to match our filters object keys (e.g., "startDate" remains "startDate")
-      const filterKey = key.charAt(0).toLowerCase() + key.slice(1);
-      filters[filterKey] = e.target.value;
-      applyFilters();
+      // Initialize filters and fetch rooms
+      setupFilters();
+      fetchHotelsAndRooms();
     });
-  });
+  </script>
 
-  fetchHotelsAndRooms();
 </script>
 </body>
 </html>

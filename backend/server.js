@@ -858,29 +858,54 @@ app.post("/customer-login", (req, res) => {
   }
 });
 
+//-------------------booking--------------------//
 app.post("/book-room", async (req, res) => {
   try {
-    const { customerID, roomID, roomNumber, startdate, enddate } = req.body;
-
+    const { customerID, roomID, roomNumber, startdate, enddate, bookingstatus } = req.body;
+    
     // Validate fields
     if (!customerID || !roomID || !roomNumber || !startdate || !enddate) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-
+    
+    // Make sure end date is after start date
+    if (new Date(enddate) <= new Date(startdate)) {
+      return res.status(400).json({ error: "End date must be after start date" });
+    }
+    
+    // Check if room is available for the selected dates
+    const availabilityResult = await pool.query(
+      `SELECT bookingid FROM booking
+       WHERE "roomID" = $1 AND "roomNumber" = $2
+       AND bookingstatus = 'Confirmed'
+       AND NOT (enddate < $3 OR startdate > $4)`,
+      [roomID, roomNumber, startdate, enddate]
+    );
+    
+    if (availabilityResult.rows.length > 0) {
+      return res.status(400).json({ error: "Room is not available for the selected dates" });
+    }
+    
     // Insert the booking into the database
     const result = await pool.query(
-      `INSERT INTO bookings (customer_id, room_id, room_number, start_date, end_date) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING booking_id`,
-      [customerID, roomID, roomNumber, startdate, enddate]
+      `INSERT INTO booking ("customerID", "roomID", "roomNumber", startdate, enddate, bookingstatus)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING bookingid`,
+      [customerID, roomID, roomNumber, startdate, enddate, bookingstatus || "Confirmed"]
     );
-
-    res.json({ bookingID: result.rows[0].booking_id, message: "Booking successful" });
+    
+    // Log successful booking
+    console.log(`New booking created: ID ${result.rows[0].bookingid} for room ${roomID}-${roomNumber}`);
+    
+    res.json({ 
+      bookingID: result.rows[0].bookingid, 
+      message: "Booking successful" 
+    });
+    
   } catch (error) {
     console.error("Booking error:", error);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: `Database error: ${error.message}` });
   }
 });
-
 
 
 // Start the server
