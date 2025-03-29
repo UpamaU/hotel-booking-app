@@ -51,10 +51,10 @@
         const password1 = document.getElementById('password1').value;
 
         try {
-          const response = await fetch('http://localhost:5001/customer-login', {  // ✅ Correct customer route
+          const response = await fetch('http://localhost:5001/customer-login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username1, password1 })  // ✅ Correct variable names
+            body: JSON.stringify({ username1, password1 }) 
           });
 
           if (response.ok) {

@@ -695,7 +695,27 @@ app.post("/customer-login", (req, res) => {
   }
 });
 
+app.post("/book-room", async (req, res) => {
+  try {
+    const { customerID, roomID, roomNumber, startdate, enddate } = req.body;
 
+    if (!customerID || !roomID || !roomNumber || !startdate || !enddate) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Insert the booking into the database
+    const result = await pool.query(
+      `INSERT INTO bookings (customer_id, room_id, room_number, start_date, end_date) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING booking_id`,
+      [customerID, roomID, roomNumber, startdate, enddate]
+    );
+
+    res.json({ bookingID: result.rows[0].booking_id, message: "Booking successful" });
+  } catch (error) {
+    console.error("Booking error:", error);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 
 // Start the server

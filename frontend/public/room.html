@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rooms | E-Hotel</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
       flex-wrap: wrap;
       margin-bottom: 30px;
     }
-    .filter-group select {
+    .filter-group select, .filter-group input {
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -26,300 +26,215 @@
 </head>
 <body>
 
-  <!-- NAVIGATION -->
-  <header class="navbar">
-    <a href="index.html">
-      <img src="images/logo.png" alt="E-Hotel Logo" class="logo" />
-    </a>
-    <nav class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="contact.html">Contact Us</a>
-      <a href="room.html">Rooms</a>
-      <a href="about.html">About Us</a>
-      <a href="profile.html">Profile</a>
-      <a href="login.htm"><button class="login-button">Login</button></a>
-      <a href="hotel-statistics.html">Hotel Statistics</a>
-    </nav>
-  </header>
+<!-- NAVIGATION -->
+<header class="navbar">
+  <a href="index.html">
+    <img src="images/logo.png" alt="E-Hotel Logo" class="logo" />
+  </a>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="contact.html">Contact Us</a>
+    <a href="room.html">Rooms</a>
+    <a href="about.html">About Us</a>
+    <a href="profile.html">Profile</a>
+    <a href="login.html"><button class="login-button">Login</button></a>
+    <a href="hotel-statistics.html">Hotel Statistics</a>
+  </nav>
+</header>
 
-  <main class="rooms-section">
-    <h1 class="page-title">Rooms</h1>
+<main class="rooms-section">
+  <h1 class="page-title">Rooms</h1>
 
-    <!-- Filter Section -->
-    <div class="filter-group">
-      <select id="capacityFilter" required>
-        <option value="">Capacity</option>
-        <option value="Single">Single</option>
-        <option value="Double">Double</option>
-        <option value="Family">Family</option>
-        <option value="Suite">Suite</option>
-      </select>
+  <!-- Filter Section -->
+  <div class="filter-group">
+    <select id="capacityFilter" required>
+      <option value="">Capacity</option>
+      <option value="Single">Single</option>
+      <option value="Double">Double</option>
+      <option value="Family">Family</option>
+      <option value="Suite">Suite</option>
+    </select>
 
-      <select id="viewFilter" required>
-        <option value="">View</option>
-        <option value="sea">Sea</option>
-        <option value="mountain">Mountain</option>
-        <option value="both">Both</option>
-        <option value="none">None</option>
-      </select>
-      
+    <select id="viewFilter" required>
+      <option value="">View</option>
+      <option value="sea">Sea</option>
+      <option value="mountain">Mountain</option>
+      <option value="both">Both</option>
+      <option value="none">None</option>
+    </select>
 
-      <select id="chainFilter" required>
-        <option value="">Hotel Chain</option>
-        <option value="Luxury Stays">Luxury Stays</option>
-        <option value="Budget Inns">Budget Inns</option>
-        <option value="Elite Resorts">Elite Resorts</option>
-        <option value="Urban Hotels">Urban Hotels</option>
-        <option value="Travel Comfort">Travel Comfort</option>
-      </select>
-      
+    <select id="chainFilter" required>
+      <option value="">Hotel Chain</option>
+      <option value="Luxury Stays">Luxury Stays</option>
+      <option value="Budget Inns">Budget Inns</option>
+      <option value="Elite Resorts">Elite Resorts</option>
+      <option value="Urban Hotels">Urban Hotels</option>
+      <option value="Travel Comfort">Travel Comfort</option>
+    </select>
 
-      <select id="extendableFilter">
-        <option value="">Extendable</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-      </select>
-      <select id="areaFilter">
-        <option value="">Area</option>
-        <option value="New York - 5th Avenue">New York - 5th Avenue</option>
-        <option value="Los Angeles - Sunset Blvd">Los Angeles - Sunset Blvd</option>
-        <option value="San Francisco - Market Street">San Francisco - Market Street</option>
-        <option value="Toronto - Bay Street">Toronto - Bay Street</option>
-        <option value="Vancouver - Robson Street">Vancouver - Robson Street</option>
-        <option value="Chicago - Michigan Ave">Chicago - Michigan Ave</option>
-        <option value="Montreal - Saint-Laurent">Montreal - Saint-Laurent</option>
-        <option value="Mexico City - Reforma Avenue">Mexico City - Reforma Avenue</option>
-        <option value="Houston - Main Street">Houston - Main Street</option>
-        <option value="Seattle - Broadway">Seattle - Broadway</option>
-        <option value="Denver - Colfax Ave">Denver - Colfax Ave</option>
-        <option value="Austin - Congress Ave">Austin - Congress Ave</option>
-        <option value="Toronto - Yonge Street">Toronto - Yonge Street</option>
-        <option value="Ottawa - Bank Street">Ottawa - Bank Street</option>
-        <option value="Las Vegas - Fremont Street">Las Vegas - Fremont Street</option>
-        <option value="Vancouver - Queen Street">Vancouver - Queen Street</option>
-        <option value="Miami - Collins Ave">Miami - Collins Ave</option>
-        <option value="Miami - Ocean Drive">Miami - Ocean Drive</option>
-        <option value="New York - Central Park West">New York - Central Park West</option>
-        <option value="San Francisco - Lombard Street">San Francisco - Lombard Street</option>
-        <option value="Los Angeles - Wilshire Blvd">Los Angeles - Wilshire Blvd</option>
-        <option value="New York - Fifth Avenue">New York - Fifth Avenue</option>
-        <option value="Toronto - King Street">Toronto - King Street</option>
-        <option value="Montreal - Sherbrooke Street">Montreal - Sherbrooke Street</option>
-        <option value="Toronto - Bloor Street">Toronto - Bloor Street</option>
-        <option value="Montreal - Rue Sainte-Catherine">Montreal - Rue Sainte-Catherine</option>
-        <option value="Vancouver - Granville Street">Vancouver - Granville Street</option>
-        <option value="Boston - Newbury Street">Boston - Newbury Street</option>
-        <option value="Miami - Lincoln Road">Miami - Lincoln Road</option>
-        <option value="Austin - Congress Street">Austin - Congress Street</option>
-        <option value="New York - Broadway">New York - Broadway</option>
-        <option value="San Diego - Downtown Street">San Diego - Downtown Street</option>
-        <option value="San Francisco - Union Street">San Francisco - Union Street</option>
-        <option value="New York - Wall Street">New York - Wall Street</option>
-        <option value="Vancouver - Main Street">Vancouver - Main Street</option>
-        <option value="Atlanta - Peachtree Street">Atlanta - Peachtree Street</option>
-        <option value="Dallas - Main Avenue">Dallas - Main Avenue</option>
-        <option value="Philadelphia - South Street">Philadelphia - South Street</option>
-      </select>
-      <select id="categoryFilter">
-        <option value="">Category</option>
-        <option value="1">★</option>
-        <option value="2">★★</option>
-        <option value="3">★★★</option>
-        <option value="4">★★★★</option>
-        <option value="5">★★★★★</option>
-      </select>
-      <input type="date" id="dateFilter" />
+    <select id="extendableFilter">
+      <option value="">Extendable</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
 
-      
-               
-    </div>
+    <select id="areaFilter">
+      <option value="">Area</option>
+      <option value="New York - 5th Avenue">New York - 5th Avenue</option>
+      <option value="Los Angeles - Sunset Blvd">Los Angeles - Sunset Blvd</option>
+      <option value="Toronto - Bay Street">Toronto - Bay Street</option>
+    </select>
 
-    <!-- Room Grid -->
-    <section class="room-grid" id="roomGrid">
-      <!-- Cards will be added here by JavaScript -->
-    </section>
-  </main>
+    <select id="categoryFilter">
+      <option value="">Category</option>
+      <option value="1">★</option>
+      <option value="2">★★</option>
+      <option value="3">★★★</option>
+      <option value="4">★★★★</option>
+      <option value="5">★★★★★</option>
+    </select>
 
-  <script>
-    const filters = {
-      capacity: '',
-      view: '',
-      chain: '',
-      extendable: '',
-      area: '',
-      category: '',
-      date:''
-    };
+    <input type="date" id="dateFilter" />
+  </div>
 
+  <!-- Room Grid -->
+  <section id="roomGrid" class="room-grid"></section>
+</main>
 
-    const capacityImages = {
-      Single: 'images/Single.jpeg',
-      Double: 'images/Double.jpeg',
-      Family: 'images/Family.jpeg',
-      Suite: 'images/Suite.jpeg',
-    };
-  
-    const roomGrid = document.getElementById('roomGrid');
-  
-    const applyFilters = () => {
-      const roomCards = document.querySelectorAll('.room-card'); // 🔄 move this here
-  
-      roomCards.forEach(card => {
-        const matches =
-          (!filters.capacity || card.dataset.capacity === filters.capacity) &&
-          (!filters.view || card.dataset.view === filters.view) &&
-          (!filters.chain || card.dataset.chain === filters.chain) &&
-          (!filters.extendable || card.dataset.extendable === filters.extendable)&&
-          (!filters.area || card.dataset.area === filters.area)&&
-          (!filters.category || card.dataset.category === filters.category)&&
-          (!filters.date || card.dataset.date === filters.date);
+<script>
+  const filters = {
+    capacity: '',
+    view: '',
+    chain: '',
+    extendable: '',
+    area: '',
+    category: '',
+    date: ''
+  };
 
-        card.style.display = matches ? 'block' : 'none';
-      });
-    };
-  
-    let hotelsById = {};
+  const capacityImages = {
+    Single: 'images/Single.jpeg',
+    Double: 'images/Double.jpeg',
+    Family: 'images/Family.jpeg',
+    Suite: 'images/Suite.jpeg'
+  };
 
-    const fetchHotelsAndRooms = async () => {
-      
-      try {
-        // Fetch hotel data first
-        const hotelRes = await fetch('http://localhost:5001/hotel');
-        const hotels = await hotelRes.json();
+  const roomGrid = document.getElementById('roomGrid');
+  let hotelsById = {};
 
-        // Map hotels by hotelid for fast lookup
-        hotels.forEach(hotel => {
+  const applyFilters = () => {
+    const roomCards = document.querySelectorAll('.room-card');
+    const isAnyFilterActive = Object.values(filters).some(val => val !== '');
+
+    roomCards.forEach(card => {
+      const matches = 
+        (!filters.capacity || card.dataset.capacity === filters.capacity) &&
+        (!filters.view || card.dataset.view === filters.view) &&
+        (!filters.chain || card.dataset.chain === filters.chain) &&
+        (!filters.extendable || card.dataset.extendable === filters.extendable) &&
+        (!filters.area || card.dataset.area === filters.area) &&
+        (!filters.category || card.dataset.category === filters.category) &&
+        (!filters.date || card.dataset.date === filters.date);
+
+      card.style.display = (isAnyFilterActive && matches) ? 'block' : 'none';
+    });
+  };
+
+  const fetchHotelsAndRooms = async () => {
+    try {
+      const [hotelRes, roomRes, bookingRes] = await Promise.all([
+        fetch('http://localhost:5001/hotel'),
+        fetch('http://localhost:5001/room'),
+        fetch('http://localhost:5001/booking')
+      ]);
+
+      const [hotels, rooms, bookings] = await Promise.all([
+        hotelRes.json(),
+        roomRes.json(),
+        bookingRes.json()
+      ]);
+
+      hotels.forEach(hotel => {
         hotelsById[hotel.hotelid] = hotel;
-        });
+      });
 
-        // Now fetch room data
-        const roomRes = await fetch('http://localhost:5001/room');
-        const rooms = await roomRes.json();
+      roomGrid.innerHTML = '';
 
-        const bookingRes = await fetch('http://localhost:5001/booking');
-        const bookings = await bookingRes.json();
+      rooms.forEach(room => {
+        const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
+        const hotel = hotelsById[room.hotelid];
+        const area = hotel?.hotel_city && hotel?.hotel_streetname
+          ? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`
+          : '';
 
-        // Example: log each booking
-        bookings.forEach(booking => {
-          console.log(`Room ${booking.roomid} is booked from ${booking.startdate} to ${booking.enddate}`);
-        });
+        const card = document.createElement('div');
+        card.className = 'room-card';
+        card.dataset.capacity = room.capacity;
+        card.dataset.chain = hotel?.chainname?.trim() || 'Unknown';
+        card.dataset.view = room.seaview && room.mountainview
+          ? 'both'
+          : room.seaview
+          ? 'sea'
+          : room.mountainview
+          ? 'mountain'
+          : 'none';
+        card.dataset.extendable = room.extendable ? 'yes' : 'no';
+        card.dataset.area = area;
+        card.dataset.category = hotel?.category?.toString() || '';
 
-
-        roomGrid.innerHTML = '';
-        function isRoomBookedOnDate(roomid, selectedDate, bookings) {
-          if (!selectedDate) return false; // No date selected → show room
-
-          const selected = new Date(selectedDate);
-          selected.setHours(0, 0, 0, 0); // Normalize selected date
-
-          // Loop through bookings → only look at this room
-          return bookings.some(b => {
-            if (b.roomID !== roomid || !b.startdate || !b.enddate) return false;
-
-            const start = new Date(b.startdate);
-            const end = new Date(b.enddate);
-
-            start.setHours(0, 0, 0, 0);
-            end.setHours(0, 0, 0, 0);
-
-            // If selected date falls in the booking window → it's booked
-            return selected >= start && selected <= end;
-          });
-        }
-
-
-
-        rooms.forEach(room => {
-          const imgSrc = capacityImages[room.capacity] || 'images/default.jpeg';
-
-          const hotel = hotelsById[room.hotelid]; // 👈 Match room to hotel
-          
-
-          const card = document.createElement('div');
-          const area = hotel?.hotel_city && hotel?.hotel_streetname? `${hotel.hotel_city.trim()} - ${hotel.hotel_streetname.trim()}`: '';
-          card.dataset.area = area;
-          card.dataset.category = hotel?.category?.toString() || '';
-
-          card.className = 'room-card';
-          if (filters.date && isRoomBookedOnDate(room.roomid, filters.date, bookings)) {
-            return; // skip rendering this room
-          }
-
-
-
-          card.dataset.capacity = room.capacity;
-          card.dataset.chain = hotel?.chainname?.trim() || 'Unknown';
-          if (room.seaview && room.mountainview) {
-            card.dataset.view = 'both';
-          } else if (room.seaview) {
-            card.dataset.view = 'sea';
-          } else if (room.mountainview) {
-            card.dataset.view = 'mountain';
-          } else {
-            card.dataset.view = 'none';
-          }
-          card.dataset.extendable = room.extendable ? 'yes' : 'no';
-          card.dataset.country = hotel?.hotel_country?.trim() || '';
-
-          card.innerHTML = `
+        card.innerHTML = `
           <img src="${imgSrc}" alt="${room.capacity} Room" class="room-image" />
-          <h2 class="room-subheading">${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
-          <p class="room-text">
+          <h2>${hotel?.chainname || 'No Chain'} - ${room.capacity}</h2>
+          <p>
             Capacity: ${room.capacity}<br/>
             Price: $${Number(room.price).toFixed(2)}<br/>
             Category: ${hotel?.category ? '★'.repeat(hotel.category) : 'Unrated'}<br/>
-            Sea View: ${room.seaview ? 'Yes' : 'No'}<br/>
-            Mountain View: ${room.mountainview ? 'Yes' : 'No'}<br/>
-            Chain: ${hotel?.chainname || 'Unknown'}<br/>
             Location: ${hotel?.hotel_streetnumber || ''} ${hotel?.hotel_streetname || ''}, ${hotel?.hotel_city || ''}, ${hotel?.hotel_country || ''}
           </p>
           <div style="text-align: right; padding: 0 16px 16px;">
-            <button class="btn">Book</button>
+            <button onclick="bookRoom(${room.roomid}, ${room.roomnumber}, 1, '2025-04-01', '2025-04-05')">Book</button>
           </div>
         `;
         roomGrid.appendChild(card);
-        });
-    applyFilters();
-  } catch (error) {
-      console.error('Error fetching room data:', error);
+      });
+
+      applyFilters();
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
-  
-    // Filter dropdowns
-    document.getElementById('capacityFilter').addEventListener('change', e => {
-      filters.capacity = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('viewFilter').addEventListener('change', e => {
-      filters.view = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('chainFilter').addEventListener('change', e => {
-      filters.chain = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('extendableFilter').addEventListener('change', e => {
-      filters.extendable = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('areaFilter').addEventListener('change', e => {
-      filters.area = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('categoryFilter').addEventListener('change', e => {
-      filters.category = e.target.value;
-      applyFilters();
-    });
-    document.getElementById('dateFilter').addEventListener('change', e => {
-      filters.date = e.target.value;
-      applyFilters();
+  const bookRoom = async (roomID, roomNumber) => {
+  const today = new Date().toISOString().split("T")[0]; // Format YYYY-MM-DD
+  const customerID = 101; // Hardcoded customer ID
+
+  try {
+    const res = await fetch("http://localhost:5001/book-room", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customerID, roomID, roomNumber, startdate: today, enddate: today })
     });
 
+    const data = await res.json();
+    if (res.ok) {
+      alert(`Booking successful! ID: ${data.bookingID}`);
+    } else {
+      alert(`Booking failed: ${data.error}`);
+    }
+  } catch (error) {
+    alert("Booking failed due to a network error.");
+  }
+};
 
 
+  document.querySelectorAll('.filter-group select, .filter-group input').forEach(filter => {
+    filter.addEventListener('change', e => {
+      filters[e.target.id.replace('Filter', '').toLowerCase()] = e.target.value;
+      applyFilters();
+    });
+  });
 
-    fetchHotelsAndRooms();
-  </script>  
+  fetchHotelsAndRooms();
+</script>
 </body>
 </html>
