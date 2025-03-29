@@ -240,7 +240,7 @@
                     <option value="true">Extendable</option>
                 </select>
                 <input type="text" id="amenities" placeholder="Amenities">
-                <input type="text" id="probStatus" placeholder="Problem Status">
+                <input type="text" id="probStatus" placeholder="Problem Status (leave empty or type 'repairing')">
                 <input type="number" id="roomHotelID" placeholder="Hotel ID" required>
                 <select id="seaViewSelect">
                     <option value="false">No Sea View</option>
@@ -936,8 +936,14 @@
             // format amenities as a postgresql array string, need this so rooms can be added witjout error
             let amenitiesValue = document.getElementById('amenities').value || null;
             if (amenitiesValue) {
-                // If it's a comma-separated string,(which it will show up as on the ui) format it as postgresql array
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
                 amenitiesValue = '{' + amenitiesValue + '}';
+            }
+
+            let probStatusValue = document.getElementById('probStatus').value || null;
+            if (probStatusValue) {
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
+                probStatusValue = '{' + probStatusValue + '}';
             }
 
             const newRoom = {
@@ -947,7 +953,7 @@
                 viewtype: document.getElementById('viewType').value || null,
                 extendable: document.getElementById('extendableSelect').value === 'true',
                 amenities: amenitiesValue,
-                probstatus: document.getElementById('probStatus').value || null,
+                probstatus: probStatusValue,
                 hotelid: hotelID,
                 seaview: document.getElementById('seaViewSelect').value === 'true',
                 mountainview: document.getElementById('mountainViewSelect').value === 'true',
@@ -989,8 +995,14 @@
             // format amenities as a postgresql array string, need this so rooms can be added witjout error
             let amenitiesValue = document.getElementById('amenities').value || null;
             if (amenitiesValue) {
-                // If it's a comma-separated string,(which it will show up as on the ui) format it as postgresql array
+                // If it's a comma-separated string  like text[],(which it will show up as on the ui) format it as postgresql array
                 amenitiesValue = '{' + amenitiesValue + '}';
+            }
+
+            let probStatusValue = document.getElementById('probStatus').value || null;
+            if (probStatusValue) {
+                // If it's a comma-separated string like text[],(which it will show up as on the ui) format it as postgresql array
+                probStatusValue = '{' + probStatusValue + '}';
             }
             
             const updatedRoom = {
@@ -1000,7 +1012,7 @@
                 viewtype: document.getElementById('viewType').value || null,
                 extendable: document.getElementById('extendableSelect').value === 'true',
                 amenities: amenitiesValue,
-                probstatus: document.getElementById('probStatus').value || null,
+                probstatus: probStatusValue,
                 hotelid: document.getElementById('roomHotelID').value,
                 seaview: document.getElementById('seaViewSelect').value === 'true',
                 mountainview: document.getElementById('mountainViewSelect').value === 'true',
