@@ -249,8 +249,8 @@
             
             <div class="form-row">
             <div class="form-group">
-                <label for="employeeID">Employee ID*:</label>
-                <input type="number" id="employeeID" required>
+                <label for="rentingEmployeeID">Employee ID*:</label>
+                <input type="number" id="rentingEmployeeID" required>
             </div>
             
             <div class="form-group">
@@ -1249,7 +1249,7 @@ function populateRentingForm(booking) {
   document.getElementById('endDate').value = formatDateForInput(booking.enddate);
   
   // Focus on the employeeID field to prompt the user to enter it
-  document.getElementById('employeeID').focus();
+  document.getElementById('rentingEmployeeID').focus();
 }
 
 
@@ -1263,11 +1263,11 @@ function populateRentingForm(booking) {
     async function convertToRenting() {
   // Read values and log them for debugging
   const bookingID = document.getElementById('bookingID').value;
-  const employeeID = document.getElementById('employeeID').value;
+  const rentingEmployeeID = document.getElementById('rentingEmployeeID').value;
   
   console.log("Convert to Renting - Form values:", {
     bookingID,
-    employeeID,
+    rentingEmployeeID,
     startDate: document.getElementById('startDate').value,
     endDate: document.getElementById('endDate').value,
     daysExtended: document.getElementById('daysExtended').value,
@@ -1275,7 +1275,7 @@ function populateRentingForm(booking) {
   });
 
   // Check if either value is empty
-  if (!bookingID || !employeeID) {
+  if (!bookingID || !rentingEmployeeID) {
     alert('Please select a booking and enter your Employee ID');
     return;
   }
@@ -1299,7 +1299,7 @@ function populateRentingForm(booking) {
   // Prepare the data object for conversion matching server expectation
   const rentingData = {
     bookingid: parseInt(bookingID),  // Use lowercase as expected by server
-    employeeid: parseInt(employeeID), // Use lowercase as expected by server
+    employeeid: document.getElementById('rentingEmployeeID'),
     startdate: startDate,
     enddate: endDate,
     daysextended: parseInt(daysExtended),
@@ -1350,7 +1350,7 @@ function testFormAccess() {
   const elements = {
     bookingID: document.getElementById('bookingID'),
     bookingDetails: document.getElementById('bookingDetails'),
-    employeeID: document.getElementById('employeeID'),
+    rentingEmployeeID: document.getElementById('rentingEmployeeID'),
     startDate: document.getElementById('startDate'),
     endDate: document.getElementById('endDate'),
     daysExtended: document.getElementById('daysExtended'),
