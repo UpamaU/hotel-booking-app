@@ -1059,3 +1059,15 @@ h3 {
   background-color: #f1f1f1;
   color: #333;
 }
+
+.login_main_card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+.login_main_card:hover {
+transform: translateY(-4px);
+}
