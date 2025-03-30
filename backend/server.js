@@ -15,11 +15,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'databasepd2.cjgm0wycccwh.us-east-2.rds.amazonaws.com',
-  database: 'databasepd2',
-  password: 'Database2132',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
   ssl: {
     rejectUnauthorized: false, // Allow self-signed SSL certificates
   },
