@@ -1059,23 +1059,24 @@ app.get("/bookings", async (req, res) => {
 
 
 // Convert booking to renting
+// Convert booking to renting
 app.post("/convert-to-renting", async (req, res) => {
   try {
     // Log the raw request body
     console.log("Convert to renting request:", JSON.stringify(req.body));
     
-    const { bookingID, employeeID, startDate, endDate, daysExtended, paymentStatus, rentalPeriod } = req.body;
+    const { bookingid, employeeid, startdate, enddate, daysextended, paymentstatus, rentalperiod } = req.body;
     
     // Validate required fields
-    if (!bookingID || !employeeID) {
-      return res.status(400).json({ error: "Missing required fields", details: { bookingID, employeeID } });
+    if (!bookingid || !employeeid) {
+      return res.status(400).json({ error: "Please select a booking and enter your Employee ID", details: { bookingid, employeeid } });
     }
 
     // Check if booking exists and has 'Confirmed' status
     const bookingCheck = await pool.query(
       `SELECT bookingid, "roomID", "roomNumber", startdate, enddate FROM booking 
        WHERE bookingid = $1 AND bookingstatus = 'Confirmed'`,
-      [bookingID]
+      [bookingid]
     );
     
     if (bookingCheck.rows.length === 0) {
@@ -1084,11 +1085,11 @@ app.post("/convert-to-renting", async (req, res) => {
 
     // Use the original booking dates if not provided
     const booking = bookingCheck.rows[0];
-    const rentStartDate = startDate || booking.startdate;
-    const rentEndDate = endDate || booking.enddate;
+    const rentStartDate = startdate || booking.startdate;
+    const rentEndDate = enddate || booking.enddate;
     
     // Calculate rental period if not provided
-    const calculatedRentalPeriod = rentalPeriod || Math.ceil(
+    const calculatedRentalPeriod = rentalperiod || Math.ceil(
       (new Date(rentEndDate) - new Date(rentStartDate)) / (1000 * 60 * 60 * 24)
     );
 
@@ -1097,13 +1098,13 @@ app.post("/convert-to-renting", async (req, res) => {
       `INSERT INTO renting ("bookingID", "startDate", "endDate", "daysExtended", "paymentStatus", "rentalPeriod", "employeeID")
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "bookingID", "rentID"`,
       [
-        bookingID, 
+        bookingid, 
         rentStartDate, 
         rentEndDate, 
-        daysExtended || 0, 
-        paymentStatus || false, 
+        daysextended || 0, 
+        paymentstatus || false, 
         calculatedRentalPeriod,
-        employeeID
+        employeeid
       ]
     );
     
@@ -1132,11 +1133,11 @@ app.get("/bookings", async (req, res) => {
     const search = req.query.search || '';
     
     let query = `
-      SELECT b."bookingID", b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
+      SELECT b.bookingid, b."customerID", b."roomID", b."roomNumber", b.startdate, b.enddate, b.bookingstatus,
              c."customer_firstName", c."customer_lastName"
       FROM booking b
       LEFT JOIN customer c ON b."customerID" = c."customerID"
-      LEFT JOIN renting r ON b."bookingID" = r."bookingID"
+      LEFT JOIN renting r ON b.bookingid = r."bookingID"
       WHERE r."bookingID" IS NULL AND b.bookingstatus = 'Confirmed'
     `;
     
@@ -1146,8 +1147,8 @@ app.get("/bookings", async (req, res) => {
     if (search) {
       query += ` AND (
         b.bookingid::text LIKE $1
-        OR c.customer_firstName ILIKE $1
-        OR c.customer_lastName ILIKE $1
+        OR c."customer_firstName" ILIKE $1
+        OR c."customer_lastName" ILIKE $1
         OR b."roomNumber"::text LIKE $1
       )`;
       params.push(`%${search}%`);
@@ -1162,7 +1163,6 @@ app.get("/bookings", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
