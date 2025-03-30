@@ -598,37 +598,6 @@ body {
     font-weight: 500;
   }
   
-  
-  /* About section */
-  .about-section {
-    display: flex;
-    justify-content: space-between;
-    padding: 80px;
-  }
-  
-  .about-text {
-    max-width: 600px;
-  }
-  
-  .about-text h1 {
-    font-size: 64px;
-    font-weight: 700;
-    margin: 0;
-  }
-  
-  .about-text p {
-    font-size: 20px;
-    font-weight: 500;
-    margin-top: 16px;
-  }
-  
-  .about-image img {
-    width: 508px;
-    height: 657px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-  
   /* Info grid */
   .info-grid {
     display: flex;
