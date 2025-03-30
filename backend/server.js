@@ -1163,6 +1163,69 @@ app.get("/bookings", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.post("/convert-to-renting", async (req, res) => {
+  try {
+    console.log("Convert to renting request:", JSON.stringify(req.body));
+    
+    const { bookingid, employeeid, startdate, enddate, daysextended, paymentstatus, rentalperiod } = req.body;
+    
+    // Validate required fields
+    if (!bookingid || !employeeid) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Get the booking details INCLUDING customerID
+    const bookingCheck = await pool.query(
+      `SELECT bookingid, "roomID", "roomNumber", "customerID", startdate, enddate 
+       FROM booking WHERE bookingid = $1 AND bookingstatus = 'Confirmed'`,
+      [bookingid]
+    );
+    
+    if (bookingCheck.rows.length === 0) {
+      return res.status(400).json({ error: "Booking not found or not in 'Confirmed' status" });
+    }
+
+    const booking = bookingCheck.rows[0];
+    const rentStartDate = startdate || booking.startdate;
+    const rentEndDate = enddate || booking.enddate;
+    
+    const calculatedRentalPeriod = rentalperiod || Math.ceil(
+      (new Date(rentEndDate) - new Date(rentStartDate)) / (1000 * 60 * 60 * 24)
+    );
+
+    // Add customerID to the renting record
+    const result = await pool.query(
+      `INSERT INTO renting (
+        "bookingID", "startDate", "endDate", "daysExtended", 
+        "paymentStatus", "rentalPeriod", "employeeID"
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7) 
+      RETURNING "bookingID", "rentID"`,
+      [
+        bookingid, 
+        rentStartDate, 
+        rentEndDate, 
+        daysextended || 0, 
+        paymentstatus || false, 
+        calculatedRentalPeriod,
+        employeeid,
+      ]
+    );
+    
+    res.json({ 
+      message: "Booking successfully converted to renting", 
+      rentingID: result.rows[0].bookingID,
+      rentID: result.rows[0].rentID
+    });
+    
+  } catch (error) {
+    console.error("Error converting booking to renting:", error);
+    // Error handling...
+    res.status(500).json({ error: `Database error: ${error.message}` });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

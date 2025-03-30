@@ -1298,14 +1298,14 @@ function populateRentingForm(booking) {
 
   // Prepare the data object for conversion matching server expectation
   const rentingData = {
-    bookingid: parseInt(bookingID),  // Use lowercase as expected by server
-    employeeid: document.getElementById('rentingEmployeeID'),
-    startdate: startDate,
-    enddate: endDate,
-    daysextended: parseInt(daysExtended),
-    paymentstatus: paymentStatus,
-    rentalperiod: rentalPeriod
-  };
+  bookingid: parseInt(bookingID),
+  employeeid: parseInt(document.getElementById('rentingEmployeeID').value),
+  startdate: startDate,
+  enddate: endDate,
+  daysextended: parseInt(daysExtended),
+  paymentstatus: paymentStatus,
+  rentalperiod: rentalPeriod
+};
 
   console.log("Sending data to server:", rentingData);
 
