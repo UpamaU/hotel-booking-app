@@ -21,3 +21,6 @@ second way - using command:
     - open new terminal
     - use command "npm install concurrently --save-dev"
     - npm start
+
+To reach our admin page with the admin database, emlpoyee sign in is: SSN/SIN: 123, Password: 123
+To go through customer sign in (although our regular user page with no sign in is the same as our customer sign in page), username: 321, password: 321

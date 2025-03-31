@@ -22,7 +22,7 @@ const pool = new Pool({
   port: 5432,
   ssl: {
     rejectUnauthorized: false, // Allow SSL connections
-  }, // Allow self-signed SSL certificates
+  }, 
 });
 
 pool.connect()
